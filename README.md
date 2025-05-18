@@ -3,7 +3,7 @@ Aplikasi manajemen peminjaman ruangan, terdiri dari backend (Express.js + Prisma
 ---
 
 ## 📁 Struktur Proyek
-
+```bash
 📦 project-root/
 ├── backend/
 │ ├── controllers/
@@ -26,7 +26,7 @@ Aplikasi manajemen peminjaman ruangan, terdiri dari backend (Express.js + Prisma
 │ ├── package.json
 │ └── index.js
 └── frontend (SOON)/
-
+```
 ## 🚀 Fitur Backend
 
 - Auth (register, login) dengan JWT
@@ -60,12 +60,12 @@ cd backend
 npm install
 
 # 3. Buat file .env (contoh isinya)
-
+```bash
 echo "DATABASE_URL=\"postgresql://user:password@localhost:5432/yourdb\"" >> .env
 echo "ACCESS_TOKEN=\"your_jwt_secret\"" >> .env
 echo "ACCESS_TOKEN_EXPIRE = 100" >> .env
 echo "PORT=5000" >> .env
-
+```
 # 4. Generate Prisma client
 
 npx prisma generate

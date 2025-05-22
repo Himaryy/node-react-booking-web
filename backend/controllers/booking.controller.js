@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { parse } from "path";
+import { DateTime } from "luxon";
 
 const prisma = new PrismaClient();
 
@@ -17,28 +17,38 @@ export const createBooking = async (
   } = req.body;
 
   try {
-    const waktuMulaiDate = new Date(waktuMulai); // UTC
-    const waktuAkhirDate = new Date(
-      waktuMulaiDate.getTime() + durasiPeminjaman * 60 * 60 * 1000
-    );
+    // const waktuMulaiDate = new Date(waktuMulai); // UTC
+    const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
+      zone: "utc",
+    }).setZone("Asia/Jakarta");
 
-    const userId = await prisma.user.findFirst({
-      where: {
-        id: req.user.id,
-      },
-    });
+    const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
+
+    const userId = req.user?.id;
+
+    // const user = await prisma.user.findFirst({
+    //   where: {
+    //     id: userId,
+    //   },
+    // });
+
+    if (!userId) {
+      return res.status(404).json({
+        success: false,
+        message: "User tidak ditemukan.",
+      });
+    }
 
     const newBooking = await prisma.booking.create({
       data: {
         keperluanRuangan,
         tanggalPeminjaman: new Date(tanggalPeminjaman),
-        waktuMulai: waktuMulaiDate,
-        waktuAkhir: waktuAkhirDate,
+        waktuMulai: waktuMulaiDate.toJSDate(), // ✅ pastikan ini
+        waktuAkhir: waktuAkhirDate.toJSDate(), // ✅ pastikan ini
         durasiPeminjaman,
         status: "Submit",
-
-        userId: userId.id,
-        ruanganId: ruanganId,
+        userId,
+        ruanganId,
       },
     });
     console.log(newBooking);
@@ -46,15 +56,44 @@ export const createBooking = async (
     return res.status(200).json({
       success: true,
       message: "Successfully Booking",
-      data: {
-        newBooking,
-      },
+      data: newBooking,
     });
   } catch (error) {
     console.log("error during create ruangan: ", error);
     return res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+export const getRuanganBookings = async (
+  /** @type import('express').Request */ req,
+  /** @type import('express').Response */ res
+) => {
+  const ruanganId = parseInt(req.params.id);
+  try {
+    const bookings = await prisma.booking.findMany({
+      where: {
+        ruanganId,
+        status: "Approved",
+      },
+      select: {
+        tanggalPeminjaman: true,
+        waktuMulai: true,
+        waktuAkhir: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: bookings,
+    });
+  } catch (error) {
+    console.log("error occured : ", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -92,8 +131,23 @@ export const getAllBookingByUser = async (
   /** @type import('express').Response */ res
 ) => {
   try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: User ID not found",
+      });
+    }
     const allBooking = await prisma.booking.findMany({
-      where: { userId: req.user.id },
+      where: { userId, status: "Approved" },
+
+      //
+      include: {
+        ruangan: {
+          select: { namaRuangan: true },
+        },
+      },
     });
     console.log(allBooking);
 
@@ -101,6 +155,17 @@ export const getAllBookingByUser = async (
       success: true,
       message: "Success Find All Booking",
       data: allBooking,
+      // data: {
+      //   id,
+      //   keperluanRuangan,
+      //   tanggalPeminjaman: tanggalPeminjaman.toISOString(),
+      //   waktuMulai: waktuMulai.toISOString(),
+      //   waktuAkhir: waktuAkhir.toISOString(),
+      //   durasiPeminjaman,
+      //   status: allBooking.status,
+      //   ruangan: ruanganId,
+      //   createdAt,
+      // },
     });
   } catch (error) {
     console.log("error occured : ", error);
@@ -166,10 +231,10 @@ export const updateBookingByAdmin = async (
   } = req.body;
 
   try {
-    const waktuMulaiDate = new Date(waktuMulai); // UTC
-    const waktuAkhirDate = new Date(
-      waktuMulaiDate.getTime() + durasiPeminjaman * 60 * 60 * 1000
-    );
+    const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
+      zone: "utc",
+    }).setZone("Asia/Jakarta");
+    const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);
     console.log(bookingId);
@@ -182,30 +247,28 @@ export const updateBookingByAdmin = async (
     });
     console.log(userId);
 
-    // const booking = await prisma.booking.findFirst({
-    //   where: {
-    //     id: bookingId,
-    //   },
-    // });
-
     // Validasi bentrok dengan booking lain yang sudah Approved
     if (userId.role == "Admin") {
       const conflictBooking = await prisma.booking.findFirst({
         where: {
           id: { not: bookingId },
-          ruanganId: ruanganId,
+          ruanganId,
           tanggalPeminjaman: new Date(tanggalPeminjaman),
           status: "Approved",
-          OR: [
-            {
-              waktuMulai: {
-                lt: waktuAkhirDate,
-              },
-              waktuAkhir: {
-                gt: waktuMulaiDate,
-              },
-            },
+          AND: [
+            { waktuMulai: { lt: waktuAkhirDate.toJSDate() } },
+            { waktuAkhir: { gt: waktuMulaiDate.toJSDate() } },
           ],
+          // OR: [
+          //   {
+          //     waktuMulai: {
+          //       lt: waktuAkhirDate,
+          //     },
+          //     waktuAkhir: {
+          //       gt: waktuMulaiDate,
+          //     },
+          //   },
+          // ],
         },
       });
 
@@ -225,8 +288,8 @@ export const updateBookingByAdmin = async (
       data: {
         keperluanRuangan,
         tanggalPeminjaman: new Date(tanggalPeminjaman),
-        waktuMulai: waktuMulaiDate,
-        waktuAkhir: waktuAkhirDate,
+        waktuMulai: waktuMulaiDate.toJSDate(),
+        waktuAkhir: waktuAkhirDate.toJSDate(),
         durasiPeminjaman,
         status: status,
 
@@ -264,10 +327,10 @@ export const updateBookingByUser = async (
   } = req.body;
 
   try {
-    const waktuMulaiDate = new Date(waktuMulai); // UTC
-    const waktuAkhirDate = new Date(
-      waktuMulaiDate.getTime() + durasiPeminjaman * 60 * 60 * 1000
-    );
+    const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
+      zone: "utc",
+    }).setZone("Asia/Jakarta");
+    const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);
     console.log(bookingId);
@@ -306,8 +369,8 @@ export const updateBookingByUser = async (
       data: {
         keperluanRuangan,
         tanggalPeminjaman: new Date(tanggalPeminjaman),
-        waktuMulai: waktuMulaiDate,
-        waktuAkhir: waktuAkhirDate,
+        waktuMulai: waktuMulaiDate.toJSDate(),
+        waktuAkhir: waktuAkhirDate.toJSDate(),
         durasiPeminjaman,
         status: "Submit",
 

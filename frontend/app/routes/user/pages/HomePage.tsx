@@ -4,7 +4,7 @@ import { TimePicker } from "~/components/TimePicker";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
-import { cn } from "~/lib/utils";
+import { cn, formatTanggal, formatWaktu } from "~/lib/utils";
 import axios from "axios";
 import { OrbitProgress } from "react-loading-indicators";
 import { Separator } from "~/components/ui/separator";
@@ -14,9 +14,18 @@ interface RoomsProps {
   namaRuangan: string;
 }
 
+interface BookingProps {
+  ruanganId: number;
+  // tanggalPeminjaman: Date;
+  tanggalPeminjaman: string;
+  waktuMulai: string;
+  waktuAkhir: string;
+}
+
 const HomePage = () => {
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [rooms, setRooms] = useState<RoomsProps[]>([]);
+  const [bookings, setBookings] = useState<BookingProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [date, setDate] = useState<Date | undefined>(() => {
@@ -29,14 +38,25 @@ const HomePage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/ruangan")
+      .get("http://localhost:8000/ruangan/ruangan")
       .then((res) => {
-        // console.log("Data API:", res.data);
         setRooms(res.data.data);
       })
       .catch((error) => console.error("Error Fetching Ruangan: ", error))
       .finally(() => setIsLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (selectedRoomId !== null) {
+      axios
+        .get(`http://localhost:8000/ruangan/ruangan/${selectedRoomId}/bookings`)
+        .then((res) => {
+          console.log("Booking data:", res.data);
+          setBookings(res.data.data);
+        })
+        .catch((error) => console.error("Error fetching bookings:", error));
+    }
+  }, [selectedRoomId]);
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
 
@@ -129,6 +149,20 @@ const HomePage = () => {
           </div>
 
           <Separator className={cn("bg-gray-300")} />
+          {isLoading ? (
+            <OrbitProgress color="#32cd32" size="medium" text="" textColor="" />
+          ) : (
+            <>
+              {bookings.map((booking, index) => (
+                <div key={index}>
+                  <p>Tanggal: {formatTanggal(booking.tanggalPeminjaman)}</p>
+                  <p>{formatWaktu(booking.waktuMulai)}</p>
+                  <p>{formatWaktu(booking.waktuAkhir)}</p>
+                </div>
+              ))}
+            </>
+          )}
+          {/* <pre>{JSON.stringify(bookings, null, 2)}</pre> */}
         </div>
       </div>
     </>

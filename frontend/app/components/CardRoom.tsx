@@ -15,7 +15,7 @@ const CardRoom = ({ title, imageUrl, onSelected, selected }: Props) => {
         selected ? "outline-green-500" : "outline-black"
       } transition duration-200`}
     >
-      <div className="overflow-hidden rounded-t-xl object-cover">
+      <div className="overflow-hidden rounded-t-xl ">
         <img
           src={imageUrl}
           alt={title}
@@ -23,7 +23,7 @@ const CardRoom = ({ title, imageUrl, onSelected, selected }: Props) => {
         />
       </div>
       <div className="p-3">
-        <h3 className="font-bold">{title}</h3>
+        <h3 className="font-bold text-md">{title}</h3>
       </div>
     </div>
   );

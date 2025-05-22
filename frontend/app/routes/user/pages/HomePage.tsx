@@ -1,6 +1,6 @@
-import CardRoom from "components/CardRoom";
-import { DatePicker } from "components/DatePicker";
-import { TimePicker } from "components/TimePicker";
+import CardRoom from "~/components/CardRoom";
+import { DatePicker } from "~/components/DatePicker";
+import { TimePicker } from "~/components/TimePicker";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";

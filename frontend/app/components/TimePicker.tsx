@@ -16,12 +16,13 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
   const secondRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex items-end gap-2">
+    <div className="flex items-center gap-2">
+      {/* <Label htmlFor="hours" className="text-xs">
+        Hour
+      </Label> */}
       <div className="grid gap-1 text-center">
-        <Label htmlFor="hours" className="text-xs">
-          Hour
-        </Label>
         <TimePickerInput
+          placeholder="HH"
           picker="hours"
           date={date}
           setDate={setDate}
@@ -29,10 +30,11 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
           onRightFocus={() => minuteRef.current?.focus()}
         />
       </div>
+      <p>:</p>
       <div className="grid gap-1 text-center">
-        <Label htmlFor="minutes" className="text-xs ">
+        {/* <Label htmlFor="minutes" className="text-xs ">
           Minute
-        </Label>
+        </Label> */}
         <TimePickerInput
           picker="minutes"
           date={date}

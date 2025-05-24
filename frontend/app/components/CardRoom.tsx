@@ -1,4 +1,4 @@
-import React from "react";
+import { cn } from "~/lib/utils";
 
 interface Props {
   title: string;
@@ -11,9 +11,10 @@ const CardRoom = ({ title, imageUrl, onSelected, selected }: Props) => {
   return (
     <div
       onClick={onSelected}
-      className={`cursor-pointer rounded-xl shadow-md  outline-2 ${
-        selected ? "outline-green-500" : "outline-black"
-      } transition duration-200`}
+      className={cn(
+        "cursor-pointer rounded-xl border border-neutral-300 mb-3 bg-white shadow-sm transition duration-200 hover:shadow-md",
+        selected ? "ring-2 ring-black" : "hover:ring-1 hover:ring-neutral-400"
+      )}
     >
       <div className="overflow-hidden rounded-t-xl ">
         <img

@@ -79,6 +79,7 @@ export const getRuanganBookings = async (
         status: "Approved",
       },
       select: {
+        id: true,
         tanggalPeminjaman: true,
         waktuMulai: true,
         waktuAkhir: true,

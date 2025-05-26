@@ -21,27 +21,43 @@ import { FIELD_NAMES, FIELD_TYPES } from "constant";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Link } from "react-router";
+import { useState } from "react";
+import { OrbitProgress } from "react-loading-indicators";
 
 interface Props<T extends FieldValues> {
   schema: ZodType<T>;
   defaultValues: T;
-  //   onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>;
+  onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>;
   type: "SIGN_IN" | "SIGN_UP";
+  loading?: boolean;
 }
 
 const AuthForm = <T extends FieldValues>({
   type,
   schema,
   defaultValues,
+  onSubmit,
+  loading = false,
 }: //   onSubmit,
 Props<T>) => {
   // const router = useRoute
   const isSignIn = type === "SIGN_IN";
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const form: UseFormReturn<T> = useForm({
     resolver: zodResolver(schema),
     defaultValues: defaultValues as DefaultValues<T>,
   });
+
+  const handleSubmit = async (data: T) => {
+    setSubmitError(null);
+    const result = await onSubmit(data);
+
+    if (!result.success) {
+      setSubmitError(result.error || "An error occurred. Please try again.");
+    }
+  };
 
   return (
     <div>
@@ -52,7 +68,10 @@ Props<T>) => {
       </div>
 
       <Form {...form}>
-        <form className="space-y-2 w-full h-max-[1300px]">
+        <form
+          className="space-y-2 w-full h-max-[1300px]"
+          onSubmit={form.handleSubmit(handleSubmit)}
+        >
           {Object.keys(defaultValues).map((field) => (
             <FormField
               key={field}
@@ -84,9 +103,15 @@ Props<T>) => {
 
           <Button
             type="submit"
-            className="inline-flex min-h-8 w-full items-center justify-center rounded-md font-bold text-sm"
+            disabled={loading}
+            className="inline-flex min-h-8 w-full items-center justify-center rounded-md font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSignIn ? "Sign In" : "Sign Up"}
+            <span className="flex items-center gap-2">
+              {isSignIn ? "Sign In" : "Sign Up"}
+              {loading && (
+                <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+              )}
+            </span>
           </Button>
         </form>
 

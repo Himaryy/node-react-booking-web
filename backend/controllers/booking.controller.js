@@ -19,8 +19,8 @@ export const createBooking = async (
   try {
     // const waktuMulaiDate = new Date(waktuMulai); // UTC
     const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
-      zone: "utc",
-    }).setZone("Asia/Jakarta");
+      zone: "Asia/Jakarta",
+    });
 
     const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
 
@@ -233,8 +233,8 @@ export const updateBookingByAdmin = async (
 
   try {
     const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
-      zone: "utc",
-    }).setZone("Asia/Jakarta");
+      zone: "Asia/Jakarta",
+    });
     const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);

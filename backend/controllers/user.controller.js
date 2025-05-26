@@ -116,7 +116,7 @@ export const getUser = async (
     }
 
     return res.status(200).json({
-      data: {
+      user: {
         name: user.name,
         email: user.email,
       },

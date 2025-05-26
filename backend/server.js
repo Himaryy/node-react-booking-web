@@ -11,7 +11,12 @@ const init = () => {
   server.use(bodyParser.json({ limit: "10mb", extended: true }));
   server.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
   // server.use(cors({ Credential: true }));
-  server.use(cors({ credentials: true }));
+  server.use(
+    cors({
+      credentials: true,
+      origin: "http://localhost:5173",
+    })
+  );
   server.use("/user", userRoutes);
   server.use("/admin", AdminRouter);
   server.use("/ruangan", RuanganRouter);

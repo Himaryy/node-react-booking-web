@@ -9,3 +9,17 @@ export const FIELD_TYPES = {
   email: "email",
   password: "password",
 };
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  // token: string | null;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+}

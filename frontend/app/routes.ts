@@ -9,5 +9,6 @@ export default [
 
   layout("routes/user/pages/UserLayout.tsx", [
     route("/", "routes/user/pages/HomePage.tsx"),
+    route("/daftar-booking", "routes/user/pages/DaftarBooking.tsx"),
   ]),
 ] satisfies RouteConfig;

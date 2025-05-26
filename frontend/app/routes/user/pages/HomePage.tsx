@@ -4,7 +4,7 @@ import { TimePicker } from "~/components/TimePicker";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
-import { cn, formatTanggal, formatWaktu } from "~/lib/utils";
+import { cn } from "~/lib/utils";
 import axios from "axios";
 import { OrbitProgress } from "react-loading-indicators";
 import { Separator } from "~/components/ui/separator";
@@ -17,7 +17,6 @@ interface RoomsProps {
 
 interface BookingProps {
   id: number;
-  // tanggalPeminjaman: Date;
   tanggalPeminjaman: string;
   waktuMulai: string;
   waktuAkhir: string;
@@ -29,14 +28,23 @@ const HomePage = () => {
   const [bookings, setBookings] = useState<BookingProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [date, setDate] = useState<Date | undefined>(() => {
-    const defaultDate = new Date();
-    defaultDate.setHours(0);
-    defaultDate.setMinutes(0);
-    defaultDate.setSeconds(0);
-    return defaultDate;
+  const [hourBooking, setHourBooking] = useState<Date | undefined>(() => {
+    const defaultHourBooking = new Date();
+    defaultHourBooking.setHours(0);
+    defaultHourBooking.setMinutes(0);
+    defaultHourBooking.setSeconds(0);
+    return defaultHourBooking;
   });
 
+  const [hourDuration, setHourDuration] = useState<Date | undefined>(() => {
+    const defaultHourDuration = new Date();
+    defaultHourDuration.setHours(0);
+    defaultHourDuration.setMinutes(0);
+    defaultHourDuration.setSeconds(0);
+    return defaultHourDuration;
+  });
+
+  // Fetch Data All Ruangan
   useEffect(() => {
     axios
       .get("http://localhost:8000/ruangan/ruangan")
@@ -48,6 +56,7 @@ const HomePage = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
+  // Fetch Data selected Room
   useEffect(() => {
     if (selectedRoomId !== null) {
       axios
@@ -120,7 +129,7 @@ const HomePage = () => {
           </div>
           <div className="flex gap-3 mb-4">
             <DatePicker />
-            <TimePicker date={date} setDate={setDate} />
+            <TimePicker date={hourBooking} setDate={setHourBooking} />
           </div>
 
           {/* Durasi */}
@@ -128,7 +137,7 @@ const HomePage = () => {
             <p className="text-sm font-medium text-neutral-800">
               Durasi Peminjaman
             </p>
-            <TimePicker date={date} setDate={setDate} />
+            <TimePicker date={hourDuration} setDate={setHourDuration} />
           </div>
 
           {/* Keperluan */}
@@ -146,20 +155,30 @@ const HomePage = () => {
 
           {/* Tombol */}
           <div className="mt-auto pt-4">
-            <Button className="w-full bg-black text-white hover:bg-neutral-800 transition">
+            <Button
+              onClick={() => {
+                console.log({
+                  hourBooking,
+                });
+              }}
+              className="w-full bg-black text-white hover:bg-neutral-800 transition"
+            >
               Booking
             </Button>
           </div>
 
           <Separator className={cn("bg-gray-300 mt-4")} />
 
-          <div className="overflow-y-auto mt-4 pr-2 flex-grow h-1/3">
+          <h2 className="text-lg font-semibold text-black mt-4 mb-2">
+            Jadwal Ruangan
+          </h2>
+          <div className="flex gap-3 overflow-x-auto py-2">
             {bookings.map((booking, index) => (
               <RoomScheduleBadge
                 key={booking.id}
-                tanggal={formatTanggal(booking.tanggalPeminjaman)}
-                waktuMulai={formatWaktu(booking.waktuMulai)}
-                waktuAkhir={formatWaktu(booking.waktuAkhir)}
+                tanggal={booking.tanggalPeminjaman}
+                waktuMulai={booking.waktuMulai}
+                waktuAkhir={booking.waktuAkhir}
               />
             ))}
           </div>

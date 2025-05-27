@@ -11,7 +11,7 @@ const defaultValues = {
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { user, login } = useAuth();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 

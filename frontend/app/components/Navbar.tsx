@@ -4,11 +4,21 @@ import { useAuth } from "hooks/AuthProvider";
 import { Popover, PopoverTrigger } from "./ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { Skeleton } from "./ui/skeleton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { OrbitProgress } from "react-loading-indicators";
 
 const Navbar = () => {
   const { user, isLoading, logout } = useAuth();
-  useEffect(() => {});
+  const [isLogout, setIsLogout] = useState(false);
+
+  const handleLogout = () => {
+    setIsLogout(true);
+
+    setTimeout(() => {
+      logout();
+      setIsLogout(false);
+    }, 1000);
+  };
 
   return (
     <header className="bg-white h-16 shadow-sm flex justify-between items-center px-4 gap-2">
@@ -23,7 +33,7 @@ const Navbar = () => {
 
       <div className="flex items-center gap-4">
         {/* Jika loading dan ada kemungkinan user sebelumnya sudah login (token ada), tampilkan skeleton */}
-        {isLoading && user ? (
+        {isLoading ? (
           <>
             <Skeleton className="w-32 h-6 rounded-md bg-gray-300 animate-pulse" />
             <Skeleton className="w-10 h-10 rounded-full bg-gray-300 animate-pulse" />
@@ -51,10 +61,14 @@ const Navbar = () => {
               </PopoverTrigger>
               <PopoverContent className="w-30 mt-2 mr-4 bg-white border border-black rounded-md shadow-md z-10">
                 <button
-                  onClick={() => logout()}
-                  className="w-full text-center py-2 rounded-md text-black hover:bg-black hover:text-white font-semibold transition-colors duration-200"
+                  onClick={handleLogout}
+                  disabled={isLogout}
+                  className="w-full text-center py-2 rounded-md bg-black text-white hover:bg-gray-800 font-semibold transition-colors duration-200 flex justify-center items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 >
                   Logout
+                  {isLogout && (
+                    <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+                  )}
                 </button>
               </PopoverContent>
             </Popover>

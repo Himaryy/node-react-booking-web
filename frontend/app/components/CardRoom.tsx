@@ -3,7 +3,7 @@ import { cn } from "~/lib/utils";
 interface Props {
   title: string;
   imageUrl: string;
-  status?: "Submit" | "Approved" | "Rejected";
+  status?: string;
   selected?: boolean;
   onSelected: () => void;
 }
@@ -26,7 +26,9 @@ const CardRoom = ({ title, imageUrl, onSelected, status, selected }: Props) => {
         {/* Status Badge */}
         {status && (
           <div
-            className={`absolute right-2 top-2 rounded-xl px-4 py-1 text-xs font-semibold text-white ${statusColor[status]}`}
+            className={`absolute right-2 top-2 rounded-xl px-4 py-1 text-xs font-semibold text-white ${
+              statusColor[status as keyof typeof statusColor] || "bg-gray-400"
+            }`}
           >
             {status}
           </div>

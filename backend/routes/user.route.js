@@ -13,7 +13,7 @@ import {
   getBookingByUser,
   updateBookingByUser,
 } from "../controllers/booking.controller.js";
-import { getAllRuangan } from "../controllers/ruangan.controller.js";
+// import { getAllRuangan } from "../controllers/ruangan.controller.js";
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ router.post("/logout", logoutUser);
 
 router.get("/getUser", isAuthenticated, getUser);
 
-router.get("/ruangan", getAllRuangan);
+// router.get("/ruangan", getAllRuangan);
 
 // Booking
 router.post("/booking", isAuthenticated, createBooking);

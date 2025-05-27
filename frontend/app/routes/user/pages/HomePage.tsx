@@ -9,6 +9,7 @@ import axios from "axios";
 import { OrbitProgress } from "react-loading-indicators";
 import { Separator } from "~/components/ui/separator";
 import RoomScheduleBadge from "~/components/RoomSchduleBadge";
+import { useAuth } from "hooks/AuthProvider";
 
 interface RoomsProps {
   id: number;
@@ -22,11 +23,31 @@ interface BookingProps {
   waktuAkhir: string;
 }
 
+interface createBookingProps {
+  ruanganId: number;
+  tanggalPeminjaman: string;
+  waktuMulai: string;
+  // waktuAkhir: string;
+  durasiPeminjaman: number;
+  keperluanRuangan: string;
+}
+
 const HomePage = () => {
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [rooms, setRooms] = useState<RoomsProps[]>([]);
   const [bookings, setBookings] = useState<BookingProps[]>([]);
+  const [createBooking, setCreateBooking] = useState<createBookingProps | null>(
+    null
+  );
+
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [startTime, setStartTime] = useState<Date | undefined>(undefined);
+  const [durationTime, setDurationTime] = useState<number | undefined>(
+    undefined
+  );
+
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   const [hourBooking, setHourBooking] = useState<Date | undefined>(() => {
     const defaultHourBooking = new Date();
@@ -68,6 +89,24 @@ const HomePage = () => {
         .catch((error) => console.error("Error fetching bookings:", error));
     }
   }, [selectedRoomId]);
+
+  // Handle Booking Room
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.error("Token not found in localStorage");
+      return;
+    }
+
+    // if(selectedRoomId !== null){
+    //   const bookingData: createBookingProps ={
+    //     ruanganId:selectedRoomId,
+    //     tanggalPeminjaman:
+
+    //   }
+    // }
+  });
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
 
@@ -153,7 +192,7 @@ const HomePage = () => {
             />
           </div>
 
-          {/* Tombol */}
+          {/* BUtton Booking */}
           <div className="mt-auto pt-4">
             <Button
               onClick={() => {
@@ -161,7 +200,12 @@ const HomePage = () => {
                   hourBooking,
                 });
               }}
-              className="w-full bg-black text-white hover:bg-neutral-800 transition"
+              disabled={!user}
+              className={`w-full bg-black text-white hover:bg-neutral-800 transition ${
+                user
+                  ? "opacity-100 cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
             >
               Booking
             </Button>

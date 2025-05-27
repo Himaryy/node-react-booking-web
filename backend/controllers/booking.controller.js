@@ -83,6 +83,7 @@ export const getRuanganBookings = async (
         tanggalPeminjaman: true,
         waktuMulai: true,
         waktuAkhir: true,
+        durasiPeminjaman: true,
       },
     });
 
@@ -141,7 +142,8 @@ export const getAllBookingByUser = async (
       });
     }
     const allBooking = await prisma.booking.findMany({
-      where: { userId, status: "Approved" },
+      where: { userId },
+      // where: { userId, status: "Approved" },
 
       //
       include: {
@@ -191,10 +193,10 @@ export const getBookingByUser = async (
         id: bookingId,
         userId: userId,
       },
-      //   include: {
-      //     user: true,
-      //     ruangan: true,
-      //   },
+      include: {
+        // user: true,
+        ruangan: true,
+      },
     });
 
     if (!getBooking) {

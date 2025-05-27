@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      // setIsLoading(true);
+      setIsLoading(true);
 
       const user = await AuthService.getUser();
       // console.log("Fetched user:", user); // cek isi user

@@ -1,14 +1,16 @@
 import axios from "axios";
+import { useAuth } from "hooks/AuthProvider";
 import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
+import { useNavigate } from "react-router";
 import CardRoom from "~/components/CardRoom";
 import { DatePicker } from "~/components/DatePicker";
 import { DurationInput } from "~/components/DurationInput";
 import { TimePicker } from "~/components/TimePicker";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
-import { cn, formatTanggal, formatWaktu } from "~/lib/utils";
+import { cn } from "~/lib/utils";
 
 // interface RoomsProps {
 //   id: number;
@@ -34,7 +36,7 @@ const DaftarBooking = () => {
   const [bookings, setBookings] = useState<BookingProps[]>([]);
   const [selectedBookingData, setSelectedBookingData] =
     useState<BookingProps | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [startTime, setStartTime] = useState<Date | undefined>(undefined);
   const [durationTime, setDurationTime] = useState<number | undefined>(
     undefined
@@ -43,6 +45,20 @@ const DaftarBooking = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
 
   const isDisabled = selectedBookingData?.status !== "Submit";
+  const navigate = useNavigate();
+
+  const { user, isLoading } = useAuth();
+
+  // if (isLoading || !user) {
+  //   return null;
+  // }
+
+  // // Cek kalo user belum login arahin langsung ke sign-in
+  // useEffect(() => {
+  //   if (!user && !isLoading) {
+  //     navigate("/sign-in");
+  //   }
+  // }, [user, isLoading, navigate]);
 
   // get TOken and fetch data booking by user
   useEffect(() => {
@@ -67,7 +83,7 @@ const DaftarBooking = () => {
       })
       .catch((error) => console.error("Error Fetching Booking: ", error))
       .finally(() => {
-        setIsLoading(false);
+        setLoading(false);
       });
   }, []);
 
@@ -102,9 +118,10 @@ const DaftarBooking = () => {
         .catch((error) => {
           console.error("Error Fetching Selected Booking: ", error);
         });
-    } else {
-      setSelectedBookingRoomId(null);
     }
+    // else {
+    //   setSelectedBookingRoomId(null);
+    // }
   }, [selectedBookingRoomId]);
 
   return (
@@ -113,18 +130,18 @@ const DaftarBooking = () => {
       <div className="w-3/4 py-4 px-10">
         <h2 className="text-xl font-bold mb-2">Daftar Booking</h2>
         <div className="grid grid-cols-4 gap-6">
-          {isLoading ? (
+          {loading ? (
             <OrbitProgress color="#32cd32" size="medium" text="" textColor="" />
           ) : (
             <>
               {bookings.map((booking, index) => (
                 <CardRoom
-                  key={booking.id}
-                  title={booking.ruangan.namaRuangan}
-                  status={booking.status}
+                  key={booking?.id}
+                  title={booking?.ruangan?.namaRuangan}
+                  status={booking?.status}
                   imageUrl="https://placehold.co/600x400"
-                  onSelected={() => setSelectedBookingRoomId(booking.id)}
-                  selected={selectedBookingRoomId === booking.id}
+                  onSelected={() => setSelectedBookingRoomId(booking?.id)}
+                  selected={selectedBookingRoomId === booking?.id}
                 />
               ))}
             </>

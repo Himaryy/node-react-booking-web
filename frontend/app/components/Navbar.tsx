@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAuth } from "hooks/AuthProvider";
 import { Popover, PopoverTrigger } from "./ui/popover";
@@ -6,10 +6,12 @@ import { PopoverContent } from "@radix-ui/react-popover";
 import { Skeleton } from "./ui/skeleton";
 import { useEffect, useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const { user, isLoading, logout } = useAuth();
   const [isLogout, setIsLogout] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     setIsLogout(true);
@@ -17,6 +19,13 @@ const Navbar = () => {
     setTimeout(() => {
       logout();
       setIsLogout(false);
+
+      toast.success("Logout Berhasil", {
+        richColors: true,
+        style: { backgroundColor: "#16a34a", color: "white" },
+      });
+
+      navigate("/sign-in");
     }, 1000);
   };
 

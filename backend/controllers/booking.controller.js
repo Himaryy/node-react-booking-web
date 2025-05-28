@@ -183,12 +183,13 @@ export const getBookingByUser = async (
   /** @type import('express').Request */ req,
   /** @type import('express').Response */ res
 ) => {
-  console.log("object");
+  // console.log("object");
   try {
     const bookingId = parseInt(req.params.id);
     const userId = req.user.id;
 
-    const getBooking = await prisma.booking.findFirst({
+    // const getBooking = await prisma.booking.findFirst({
+    const getBooking = await prisma.booking.findMany({
       where: {
         id: bookingId,
         userId: userId,
@@ -230,6 +231,7 @@ export const updateBookingByAdmin = async (
     waktuMulai,
     durasiPeminjaman,
     ruanganId,
+    // namaRuangan,
     status,
   } = req.body;
 
@@ -256,22 +258,13 @@ export const updateBookingByAdmin = async (
         where: {
           id: { not: bookingId },
           ruanganId,
+          // namaRuangan,
           tanggalPeminjaman: new Date(tanggalPeminjaman),
           status: "Approved",
           AND: [
             { waktuMulai: { lt: waktuAkhirDate.toJSDate() } },
             { waktuAkhir: { gt: waktuMulaiDate.toJSDate() } },
           ],
-          // OR: [
-          //   {
-          //     waktuMulai: {
-          //       lt: waktuAkhirDate,
-          //     },
-          //     waktuAkhir: {
-          //       gt: waktuMulaiDate,
-          //     },
-          //   },
-          // ],
         },
       });
 
@@ -298,6 +291,9 @@ export const updateBookingByAdmin = async (
 
         // userId: userId.id,
         ruanganId: ruanganId,
+      },
+      include: {
+        ruangan: true,
       },
     });
 

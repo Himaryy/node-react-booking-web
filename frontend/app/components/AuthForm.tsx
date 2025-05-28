@@ -23,6 +23,7 @@ import { Button } from "./ui/button";
 import { Link } from "react-router";
 import { useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
+import { toast } from "sonner";
 
 interface Props<T extends FieldValues> {
   schema: ZodType<T>;
@@ -56,6 +57,17 @@ Props<T>) => {
 
     if (!result.success) {
       setSubmitError(result.error || "An error occurred. Please try again.");
+      toast.error("Email atau Password Salah", {
+        richColors: true,
+        style: { backgroundColor: "#dc2626", color: "white" },
+      });
+    }
+
+    if (result.success) {
+      toast.success("Berhasil Login", {
+        richColors: true,
+        style: { backgroundColor: "#16a34a", color: "white" },
+      });
     }
   };
 

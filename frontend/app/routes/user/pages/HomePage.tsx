@@ -10,6 +10,13 @@ import { OrbitProgress } from "react-loading-indicators";
 import { Separator } from "~/components/ui/separator";
 import RoomScheduleBadge from "~/components/RoomSchduleBadge";
 import { useAuth } from "hooks/AuthProvider";
+import { DurationInput } from "~/components/DurationInput";
+
+import { toast } from "sonner";
+import { DateTime } from "luxon";
+import { createBookingSchema } from "lib/validations";
+import { FileWarning } from "lucide-react";
+import withMinimumLoading from "utils/MinimumTime";
 
 interface RoomsProps {
   id: number;
@@ -36,45 +43,46 @@ const HomePage = () => {
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [rooms, setRooms] = useState<RoomsProps[]>([]);
   const [bookings, setBookings] = useState<BookingProps[]>([]);
-  const [createBooking, setCreateBooking] = useState<createBookingProps | null>(
-    null
-  );
-
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState<Date | undefined>(undefined);
-  const [durationTime, setDurationTime] = useState<number | undefined>(
+  const [keperluan, setKeperluan] = useState<string | undefined>(undefined);
+  const [dateInput, setDateInput] = useState<Date | undefined>(undefined);
+  const [startTimeInput, setStartTimeInput] = useState<Date | undefined>(
     undefined
   );
+  const [durationTimeInput, setDurationTimeInput] = useState<
+    number | undefined
+  >(undefined);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingRoom, setIsLoadingRoom] = useState(true);
+  const [isLoadingBooking, setIsLoadingBooking] = useState(false);
   const { user } = useAuth();
-
-  const [hourBooking, setHourBooking] = useState<Date | undefined>(() => {
-    const defaultHourBooking = new Date();
-    defaultHourBooking.setHours(0);
-    defaultHourBooking.setMinutes(0);
-    defaultHourBooking.setSeconds(0);
-    return defaultHourBooking;
-  });
-
-  const [hourDuration, setHourDuration] = useState<Date | undefined>(() => {
-    const defaultHourDuration = new Date();
-    defaultHourDuration.setHours(0);
-    defaultHourDuration.setMinutes(0);
-    defaultHourDuration.setSeconds(0);
-    return defaultHourDuration;
-  });
+  const isDisabled = !user || selectedRoomId === null;
 
   // Fetch Data All Ruangan
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/ruangan/ruangan")
-      .then((res) => {
-        console.log("Ruangan data:", res.data.data);
-        setRooms(res.data.data);
-      })
-      .catch((error) => console.error("Error Fetching Ruangan: ", error))
-      .finally(() => setIsLoading(false));
+    const fetchRooms = async () => {
+      try {
+        await withMinimumLoading(
+          async () => {
+            const response = await axios.get(
+              "http://localhost:8000/ruangan/ruangan"
+            );
+            setRooms(response.data.data);
+          },
+          setIsLoadingRoom,
+          2000
+        );
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+        toast.error("Gagal memuat data ruangan", {
+          description: "Terjadi kesalahan saat mengambil data ruangan.",
+          richColors: true,
+          style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+          icon: <FileWarning className="text-white" />,
+        });
+      }
+    };
+
+    fetchRooms();
   }, []);
 
   // Fetch Data selected Room
@@ -83,7 +91,6 @@ const HomePage = () => {
       axios
         .get(`http://localhost:8000/ruangan/ruangan/${selectedRoomId}/bookings`)
         .then((res) => {
-          console.log("Booking data:", res.data);
           setBookings(res.data.data);
         })
         .catch((error) => console.error("Error fetching bookings:", error));
@@ -91,22 +98,98 @@ const HomePage = () => {
   }, [selectedRoomId]);
 
   // Handle Booking Room
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const handleBooking = async () => {
+    console.log("cek button");
+    if (
+      !selectedRoom ||
+      !dateInput ||
+      !startTimeInput ||
+      !durationTimeInput ||
+      !keperluan
+    ) {
+      toast.error("Mohon lengkapi field yang kosong", {
+        description: "Pastikan semua field terisi dengan benar.",
+        richColors: true,
+        style: { backgroundColor: "#facc15", color: "black" }, // bit dark red
+      });
+      return;
+    }
+    console.log("Data yang akan dikirim:", {
+      selectedRoom,
+      dateInput,
+      startTimeInput,
+      durationTimeInput,
+      keperluan,
+    });
 
-    if (!token) {
-      console.error("Token not found in localStorage");
+    const bookingData: createBookingProps = {
+      ruanganId: selectedRoom.id,
+      tanggalPeminjaman: DateTime.fromJSDate(dateInput).toISODate()!,
+      waktuMulai: DateTime.fromJSDate(startTimeInput).toISO()!,
+      durasiPeminjaman: durationTimeInput,
+      keperluanRuangan: keperluan,
+    };
+    console.log(bookingData);
+
+    const parsedBookingData = createBookingSchema.safeParse(bookingData);
+
+    if (!parsedBookingData.success) {
+      toast.error("Validasi Gagal", {
+        description: parsedBookingData.error.errors.map((err) => err.message),
+        richColors: true,
+        style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+      });
       return;
     }
 
-    // if(selectedRoomId !== null){
-    //   const bookingData: createBookingProps ={
-    //     ruanganId:selectedRoomId,
-    //     tanggalPeminjaman:
+    console.log("Data valid, siap dikirim:", parsedBookingData.data);
 
-    //   }
-    // }
-  });
+    // send booking request to backend
+    try {
+      // Token Authorization
+      await withMinimumLoading(
+        async () => {
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            console.error("Token not found in localStorage");
+            return;
+          }
+          console.log(parsedBookingData);
+
+          await axios.post("http://localhost:8000/user/booking", bookingData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          toast.success("Booking Berhasil", {
+            description: "Ruangan berhasil dibooking.",
+            richColors: true,
+            style: { backgroundColor: "#16a34a", color: "white" }, // bit green
+          });
+
+          // Clear form field after successful booking
+          setDateInput(undefined);
+          setStartTimeInput(undefined);
+          setDurationTimeInput(undefined);
+          setKeperluan(undefined);
+        },
+        setIsLoadingBooking,
+        2000
+      );
+    } catch (error) {
+      // console.error("Error creating booking:", error);
+      toast.error("Booking Gagal", {
+        description: "Terjadi kesalahan saat melakukan booking.",
+        richColors: true,
+        style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+        icon: <FileWarning className="text-white" />,
+      });
+    } finally {
+      setIsLoadingBooking(false);
+    }
+  };
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
 
@@ -118,7 +201,7 @@ const HomePage = () => {
         <div className="w-3/4 py-4 px-10">
           <h2 className="text-xl font-bold mb-2">Pilih Ruangan</h2>
           <div className="grid grid-cols-4 gap-6">
-            {isLoading ? (
+            {isLoadingRoom ? (
               <OrbitProgress
                 color="#32cd32"
                 size="medium"
@@ -152,23 +235,29 @@ const HomePage = () => {
 
           {/* Nama Ruangan */}
           <div className="mb-4">
-            <p className="text-sm text-neutral-700">
+            <p className="text-sm font-medium text-neutral-800">
               Nama Ruangan:{" "}
-              <span className="font-medium text-black">
-                {selectedRoom?.namaRuangan}
-              </span>
+              <span className="font-semibold">{selectedRoom?.namaRuangan}</span>
             </p>
           </div>
 
           {/* Tanggal & Jam */}
           <div className="mb-2">
             <p className="text-sm font-medium text-neutral-800">
-              Pilih Tanggal dan Jam
+              Pilih Tanggal dan Jam (Format 24 Jam)
             </p>
           </div>
           <div className="flex gap-3 mb-4">
-            <DatePicker />
-            <TimePicker date={hourBooking} setDate={setHourBooking} />
+            <DatePicker
+              value={dateInput}
+              onChange={setDateInput}
+              disabled={isDisabled}
+            />
+            <TimePicker
+              date={startTimeInput}
+              setDate={setStartTimeInput}
+              disabled={isDisabled}
+            />
           </div>
 
           {/* Durasi */}
@@ -176,7 +265,14 @@ const HomePage = () => {
             <p className="text-sm font-medium text-neutral-800">
               Durasi Peminjaman
             </p>
-            <TimePicker date={hourDuration} setDate={setHourDuration} />
+            <DurationInput
+              value={durationTimeInput}
+              onChange={setDurationTimeInput}
+              min={0}
+              max={12}
+              disabled={isDisabled}
+            />
+            <span className="text-sm font-medium text-neutral-800">Jam</span>
           </div>
 
           {/* Keperluan */}
@@ -185,6 +281,9 @@ const HomePage = () => {
               Keperluan
             </p>
             <Textarea
+              value={keperluan}
+              disabled={isDisabled}
+              onChange={(e) => setKeperluan(e.target.value)}
               className={cn(
                 "w-full border border-neutral-300 bg-white text-black text-sm p-2 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
               )}
@@ -195,19 +294,22 @@ const HomePage = () => {
           {/* BUtton Booking */}
           <div className="mt-auto pt-4">
             <Button
-              onClick={() => {
-                console.log({
-                  hourBooking,
-                });
-              }}
-              disabled={!user}
+              onClick={handleBooking}
+              disabled={isDisabled || isLoadingBooking}
               className={`w-full bg-black text-white hover:bg-neutral-800 transition ${
                 user
                   ? "opacity-100 cursor-pointer"
                   : "opacity-50 cursor-not-allowed"
               }`}
             >
-              Booking
+              <span className="flex items-center gap-2">
+                Booking{" "}
+                <span>
+                  {isLoadingBooking && (
+                    <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+                  )}
+                </span>
+              </span>
             </Button>
           </div>
 

@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const user = await AuthService.getUser();
       // console.log("Fetched user:", user); // cek isi user
       setUser(user);
+      localStorage.setItem("user", JSON.stringify(user) || "");
     } catch (error) {
       // console.error("Failed to fetch user:", error);
       setUser(null);
@@ -42,6 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await AuthService.logoutUser();
       setUser(null);
+      localStorage.removeItem("user");
     } finally {
       setIsLoading(false);
     }

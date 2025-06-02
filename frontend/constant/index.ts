@@ -1,13 +1,13 @@
 export const FIELD_NAMES = {
-  fullName: "Full name",
+  name: "Full name",
   email: "Email",
   password: "Password",
 };
 
 export const FIELD_TYPES = {
-  fullName: "text",
-  email: "email",
-  password: "password",
+  name: "Full Name",
+  email: "Email",
+  password: "Password",
 };
 
 export interface User {

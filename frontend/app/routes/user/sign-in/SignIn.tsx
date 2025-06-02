@@ -15,6 +15,21 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+  // const location = useLocation();
+  // const toastShown = useRef(false);
+
+  // useEffect(() => {
+  //   if (location.state?.needLoginToast) {
+  //     toast.error("Akses ditolak", {
+  //       description: "Harap Login Terlebih Dahulu.",
+  //       richColors: true,
+  //       style: { backgroundColor: "#dc2626", color: "white" },
+  //       icon: <BanIcon className="text-white mr-2" />,
+  //     });
+  //     toastShown.current = true;
+  //   }
+  // }, [location.state]);
+
   const onSubmit = async (data: typeof defaultValues) => {
     setIsLoading(true);
     try {
@@ -29,6 +44,7 @@ const SignIn = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <div>
       <AuthForm

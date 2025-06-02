@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useAuth } from "hooks/AuthProvider";
+import { FileWarning } from "lucide-react";
 import { DateTime } from "luxon";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
-import { useNavigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
+import { toast } from "sonner";
+import { withMinimumLoading } from "utils/MinimumTime";
 import CardRoom from "~/components/CardRoom";
 import { DatePicker } from "~/components/DatePicker";
 import { DurationInput } from "~/components/DurationInput";
@@ -43,22 +46,17 @@ const DaftarBooking = () => {
   );
   const [keperluan, setKeperluan] = useState<string | undefined>(undefined);
   const [date, setDate] = useState<Date | undefined>(undefined);
+  const [isLoadingBooking, setIsLoadingBooking] = useState(false);
+  const [isLoadingBookingDelete, setIsLoadingBookingDelete] = useState(false);
 
   const isDisabled = selectedBookingData?.status !== "Submit";
-  const navigate = useNavigate();
 
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
+  const location = useLocation();
 
-  // if (isLoading || !user) {
-  //   return null;
-  // }
-
-  // // Cek kalo user belum login arahin langsung ke sign-in
-  // useEffect(() => {
-  //   if (!user && !isLoading) {
-  //     navigate("/sign-in");
-  //   }
-  // }, [user, isLoading, navigate]);
+  if (!user) {
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  }
 
   // get TOken and fetch data booking by user
   useEffect(() => {
@@ -107,13 +105,14 @@ const DaftarBooking = () => {
         .then((res) => {
           console.log("Selected Booking data:", res.data.data);
           const booking = res.data.data;
+          console.log("Nama Ruangan:", booking?.ruangan?.namaRuangan);
           setSelectedBookingData(booking);
 
           setDate(DateTime.fromISO(booking.tanggalPeminjaman).toJSDate());
           setStartTime(DateTime.fromISO(booking.waktuMulai).toJSDate());
           setKeperluan(booking.keperluanRuangan);
           setDurationTime(booking.durasiPeminjaman);
-          // console.log(setKeperluan);
+          // console.log(setDate);
         })
         .catch((error) => {
           console.error("Error Fetching Selected Booking: ", error);
@@ -123,6 +122,113 @@ const DaftarBooking = () => {
     //   setSelectedBookingRoomId(null);
     // }
   }, [selectedBookingRoomId]);
+
+  // Update by user if status === submit
+  const handleUpdateBooking = async () => {
+    if (
+      !selectedBookingRoomId ||
+      !date ||
+      !startTime ||
+      !durationTime ||
+      !keperluan
+    ) {
+      toast.error("Mohon lengkapi field yang kosong", {
+        description: "Pastikan semua field terisi dengan benar.",
+        richColors: true,
+        style: { backgroundColor: "#facc15", color: "black" }, // bit dark red
+      });
+      return;
+    }
+
+    // Patch data to API
+    try {
+      await withMinimumLoading(
+        async () => {
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            console.error("Token not found in storage");
+            return;
+          }
+
+          if (!selectedBookingRoomId) return;
+
+          await axios.patch(
+            `http://localhost:8000/user/booking/${selectedBookingRoomId}`,
+            {
+              tanggalPeminjaman: date?.toISOString(),
+              waktuMulai: startTime?.toISOString(),
+              durasiPeminjaman: durationTime,
+              keperluanRuangan: keperluan,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        },
+        setIsLoadingBooking,
+        1000
+      );
+
+      toast.success("Update Berhasil", {
+        description: "Ruangan berhasil di update.",
+        richColors: true,
+        style: { backgroundColor: "#16a34a", color: "white" }, // bit green
+      });
+    } catch (error) {
+      toast.error("Update Gagal", {
+        description: "Terjadi kesalahan saat melakukan update.",
+        richColors: true,
+        style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+        icon: <FileWarning className="text-white" />,
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("Token not found ");
+        return;
+      }
+
+      await withMinimumLoading(
+        async () => {
+          await axios.delete(
+            `http://localhost:8000/user/booking/${selectedBookingRoomId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        },
+        setIsLoadingBookingDelete,
+        1000
+      );
+      setBookings((prev) =>
+        prev.filter((booking) => booking.id !== selectedBookingRoomId)
+      );
+      setSelectedBookingRoomId(null);
+
+      toast.success("Cancel Booking", {
+        description: "Ruangan berhasil di cancel.",
+        richColors: true,
+        style: { backgroundColor: "#16a34a", color: "white" }, // bit green
+      });
+    } catch (error) {
+      toast.error("Error Cancel Booking", {
+        description: "Terjadi kesalahan saat melakukan cancel booking.",
+        richColors: true,
+        style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+        icon: <FileWarning className="text-white" />,
+      });
+    }
+  };
 
   return (
     <div className="h-full flex gap-4">
@@ -134,16 +240,19 @@ const DaftarBooking = () => {
             <OrbitProgress color="#32cd32" size="medium" text="" textColor="" />
           ) : (
             <>
-              {bookings.map((booking, index) => (
-                <CardRoom
-                  key={booking?.id}
-                  title={booking?.ruangan?.namaRuangan}
-                  status={booking?.status}
-                  imageUrl="https://placehold.co/600x400"
-                  onSelected={() => setSelectedBookingRoomId(booking?.id)}
-                  selected={selectedBookingRoomId === booking?.id}
-                />
-              ))}
+              {bookings.map((booking, index) => {
+                // console.log("Booking:", booking);
+                return (
+                  <CardRoom
+                    key={booking?.id}
+                    title={booking?.ruangan?.namaRuangan}
+                    status={booking?.status}
+                    imageUrl="https://placehold.co/600x400"
+                    onSelected={() => setSelectedBookingRoomId(booking?.id)}
+                    selected={selectedBookingRoomId === booking?.id}
+                  />
+                );
+              })}
             </>
           )}
         </div>
@@ -151,11 +260,31 @@ const DaftarBooking = () => {
 
       {/* Sebelah kanan */}
       <div className="w-1/3 p-4 border-l sticky h-screen top-0">
-        <h2 className="text-lg font-semibold text-black mb-2">Edit Jadwal</h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-semibold text-black mb-2">Edit Jadwal</h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={
+              selectedBookingData?.status !== "Submit" || isLoadingBooking
+            }
+            onClick={handleDelete}
+            className="w-20 bg-red-500 text-white hover:bg-red-600 hover:text-white"
+          >
+            <span>
+              {isLoadingBookingDelete ? (
+                <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+              ) : (
+                <div>
+                  <p>Cancel</p>
+                </div>
+              )}
+            </span>
+          </Button>
+        </div>
         <p className="text-sm text-neutral-600 mb-4">
           Silahkan ubah tanggal, jam, dan keperluan peminjaman ruangan.
         </p>
-
         {/* Nama Ruangan */}
         <div className="mb-4">
           <p className="text-sm text-neutral-700">
@@ -186,7 +315,6 @@ const DaftarBooking = () => {
           <p className="text-sm font-medium text-neutral-800">
             Durasi Peminjaman
           </p>
-          {/* <TimePicker date={durationTime} setDate={setDurationTime} /> */}
           <DurationInput
             value={durationTime}
             onChange={setDurationTime}
@@ -214,13 +342,20 @@ const DaftarBooking = () => {
         {/* Tombol */}
         <div className="mt-auto pt-4">
           <Button
-            onClick={() => {
-              console.log({});
-            }}
-            disabled={selectedBookingData?.status !== "Submit"}
+            onClick={handleUpdateBooking}
+            disabled={
+              selectedBookingData?.status !== "Submit" || isLoadingBooking
+            }
             className="w-full bg-black text-white hover:bg-neutral-800 transition disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Simpan Perubahan
+            <span className="flex items-center gap-2">
+              Simpan Perubahan{" "}
+              <span>
+                {isLoadingBooking && (
+                  <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+                )}
+              </span>
+            </span>
           </Button>
         </div>
       </div>

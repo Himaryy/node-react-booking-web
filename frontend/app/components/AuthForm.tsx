@@ -57,17 +57,25 @@ Props<T>) => {
 
     if (!result.success) {
       setSubmitError(result.error || "An error occurred. Please try again.");
-      toast.error("Email atau Password Salah", {
-        richColors: true,
-        style: { backgroundColor: "#dc2626", color: "white" },
-      });
+      toast.error(
+        isSignIn
+          ? "Email atau Password Salah"
+          : "Gagal mendaftar. Silakan coba lagi.",
+        {
+          richColors: true,
+          style: { backgroundColor: "#dc2626", color: "white" },
+        }
+      );
     }
 
     if (result.success) {
-      toast.success("Berhasil Login", {
-        richColors: true,
-        style: { backgroundColor: "#16a34a", color: "white" },
-      });
+      toast.success(
+        isSignIn ? "Berhasil Login" : "Pendaftaran berhasil! Selamat datang.",
+        {
+          richColors: true,
+          style: { backgroundColor: "#16a34a", color: "white" },
+        }
+      );
     }
   };
 

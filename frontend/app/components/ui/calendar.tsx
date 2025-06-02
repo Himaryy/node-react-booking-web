@@ -1,9 +1,9 @@
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "~/lib/utils"
-import { buttonVariants } from "~/components/ui/button"
+import { cn } from "~/lib/utils";
+import { buttonVariants } from "~/components/ui/button";
 
 function Calendar({
   className,
@@ -48,7 +48,7 @@ function Calendar({
           "day-range-end aria-selected:bg-primary aria-selected:text-primary-foreground",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
+        day_today: "bg-gray-300 text-accent-foreground",
         day_outside:
           "day-outside text-muted-foreground aria-selected:text-muted-foreground",
         day_disabled: "text-muted-foreground opacity-50",
@@ -67,7 +67,7 @@ function Calendar({
       }}
       {...props}
     />
-  )
+  );
 }
 
-export { Calendar }
+export { Calendar };

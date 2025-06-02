@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { DateTime } from "luxon";
 import { createBookingSchema } from "lib/validations";
 import { FileWarning } from "lucide-react";
-import withMinimumLoading from "utils/MinimumTime";
+import { withMinimumLoading } from "utils/MinimumTime";
 
 interface RoomsProps {
   id: number;
@@ -69,7 +69,7 @@ const HomePage = () => {
             setRooms(response.data.data);
           },
           setIsLoadingRoom,
-          2000
+          1000
         );
       } catch (error) {
         console.error("Error fetching rooms:", error);
@@ -162,22 +162,22 @@ const HomePage = () => {
               Authorization: `Bearer ${token}`,
             },
           });
-
-          toast.success("Booking Berhasil", {
-            description: "Ruangan berhasil dibooking.",
-            richColors: true,
-            style: { backgroundColor: "#16a34a", color: "white" }, // bit green
-          });
-
-          // Clear form field after successful booking
-          setDateInput(undefined);
-          setStartTimeInput(undefined);
-          setDurationTimeInput(undefined);
-          setKeperluan(undefined);
         },
         setIsLoadingBooking,
-        2000
+        1000
       );
+
+      toast.success("Booking Berhasil", {
+        description: "Ruangan berhasil dibooking.",
+        richColors: true,
+        style: { backgroundColor: "#16a34a", color: "white" }, // bit green
+      });
+
+      // Clear form field after successful booking
+      setDateInput(undefined);
+      setStartTimeInput(undefined);
+      setDurationTimeInput(undefined);
+      setKeperluan("");
     } catch (error) {
       // console.error("Error creating booking:", error);
       toast.error("Booking Gagal", {
@@ -186,9 +186,10 @@ const HomePage = () => {
         style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
         icon: <FileWarning className="text-white" />,
       });
-    } finally {
-      setIsLoadingBooking(false);
     }
+    // finally {
+    //   setIsLoadingBooking(false);
+    // }
   };
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);

@@ -26,12 +26,9 @@ export function DatePicker({ value, onChange, disabled }: DatePickerProps) {
     setDate(value);
   }, [value]);
 
-  const handleSelectDate = (date: Date | undefined) => {
-    if (!date) return;
-
-    setDate(date);
-
-    if (onChange) onChange(date);
+  const handleSelectDate = (selected: Date | undefined) => {
+    if (!selected) return;
+    if (onChange) onChange(selected);
   };
 
   return (
@@ -39,6 +36,7 @@ export function DatePicker({ value, onChange, disabled }: DatePickerProps) {
       <PopoverTrigger asChild>
         <Button
           disabled={disabled}
+          // value={date ? date.toISOString().split("T")[0] : ""}
           variant={"outline"}
           className={cn(
             "w-[200px] justify-start text-left font-normal",

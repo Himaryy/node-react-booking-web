@@ -188,8 +188,8 @@ export const getBookingByUser = async (
     const bookingId = parseInt(req.params.id);
     const userId = req.user.id;
 
-    // const getBooking = await prisma.booking.findFirst({
-    const getBooking = await prisma.booking.findMany({
+    const getBooking = await prisma.booking.findFirst({
+      // const getBooking = await prisma.booking.findMany({
       where: {
         id: bookingId,
         userId: userId,

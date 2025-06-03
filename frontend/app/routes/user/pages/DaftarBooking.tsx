@@ -51,12 +51,8 @@ const DaftarBooking = () => {
 
   const isDisabled = selectedBookingData?.status !== "Submit";
 
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
-
-  if (!user) {
-    return <Navigate to="/sign-in" state={{ from: location }} replace />;
-  }
 
   // get TOken and fetch data booking by user
   useEffect(() => {
@@ -122,6 +118,14 @@ const DaftarBooking = () => {
     //   setSelectedBookingRoomId(null);
     // }
   }, [selectedBookingRoomId]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  }
 
   // Update by user if status === submit
   const handleUpdateBooking = async () => {

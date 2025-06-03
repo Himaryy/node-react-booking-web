@@ -14,12 +14,23 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role: string;
+}
+
+export interface Admin {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 export interface AuthContextType {
   user: User | null;
-  // hasToken: () => boolean;
+  admin: Admin | null;
   isLoading: boolean;
+  isLoadingAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  loginAdmin: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  logoutAdmin: () => Promise<void>;
 }

@@ -1,7 +1,8 @@
 import { useAuth } from "hooks/AuthProvider";
 import { signInSchema } from "lib/validations";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
+import { withMinimumLoading } from "utils/MinimumTime";
 import AuthForm from "~/components/AuthForm";
 
 const defaultValues = {
@@ -11,17 +12,22 @@ const defaultValues = {
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { loginAdmin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-  const onSubmit = async (data: typeof defaultValues) => {
+  const handleLogin = async (data: typeof defaultValues) => {
     setIsLoading(true);
-    try {
-      await login(data.email, data.password);
-      await delay(1000);
 
-      navigate("/");
+    try {
+      await withMinimumLoading(
+        async () => {
+          await loginAdmin(data.email, data.password);
+
+          navigate("/dashboard");
+        },
+        setIsLoading,
+        1000
+      );
       return { success: true };
     } catch (error) {
       return { success: false, error: "Login failed. Please try again." };
@@ -29,14 +35,13 @@ const SignIn = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div>
       <AuthForm
-        type="SIGN_IN"
+        type="SIGN_ADMIN"
         schema={signInSchema}
         defaultValues={defaultValues}
-        onSubmit={onSubmit}
+        onSubmit={handleLogin}
         loading={isLoading}
       />
     </div>

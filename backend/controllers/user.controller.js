@@ -119,6 +119,93 @@ export const getUser = async (
       user: {
         name: user.name,
         email: user.email,
+        // role: user.role,
+      },
+    });
+  } catch (error) {
+    console.log("Error occured ", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error ",
+    });
+  }
+};
+
+export const loginAdmin = async (
+  /** @type import('express').Request */ req,
+  /** @type import('express').Response */ res
+) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: { email, role: "Admin" },
+    });
+    const hashedPassword = await bcrypt.compare(password, user.password);
+
+    if (!user || !hashedPassword) {
+      return res.status(401).json({ message: "Invalid Email or Password" });
+    }
+
+    sendToken(user, 200, res);
+    console.log(user);
+  } catch (error) {
+    console.log("Gagal Login: ", error);
+    res.status(500).json({ message: "Server error during login" });
+  }
+};
+
+export const logoutAdmin = async (
+  /** @type import('express').Request */ req,
+  /** @type import('express').Response */ res
+) => {
+  try {
+    res.clearCookie("access_token");
+
+    res.status(200).json({
+      success: true,
+      message: "Admin Logout Successfully",
+    });
+  } catch (error) {
+    console.log("Error Lgout User: ", error);
+    res.status(500).json({
+      success: false,
+
+      message: error.message,
+    });
+  }
+};
+
+export const getAdmin = async (
+  /** @type import('express').Request */ req,
+  /** @type import('express').Response */ res
+) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.role !== "Admin") {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized",
+      });
+    }
+
+    return res.status(200).json({
+      user: {
+        email: user.email,
+        name: user.name,
+        // role: user.role,
       },
     });
   } catch (error) {

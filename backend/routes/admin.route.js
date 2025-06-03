@@ -12,8 +12,18 @@ import {
   getAllBookingByAdmin,
   updateBookingByAdmin,
 } from "../controllers/booking.controller.js";
+import {
+  getAdmin,
+  loginAdmin,
+  logoutAdmin,
+} from "../controllers/user.controller.js";
 
 const router = express.Router();
+
+// Login admin
+router.post("/login", loginAdmin);
+router.post("/logout", logoutAdmin);
+router.get("/getAdmin", isAuthenticated, isAdmin, getAdmin);
 
 // Ruangan
 router.post("/ruangan", isAuthenticated, isAdmin, createRuangan);

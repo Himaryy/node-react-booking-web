@@ -91,7 +91,19 @@ const HomePage = () => {
       axios
         .get(`http://localhost:8000/ruangan/ruangan/${selectedRoomId}/bookings`)
         .then((res) => {
-          setBookings(res.data.data);
+          // Filter data booking
+          // Only show from today
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const upcomingBookings = res.data.data.filter((booking: any) => {
+            const bookingDate = new Date(booking.tanggalPeminjaman);
+            bookingDate.setHours(0, 0, 0, 0);
+
+            return bookingDate >= today;
+          });
+
+          setBookings(upcomingBookings);
         })
         .catch((error) => console.error("Error fetching bookings:", error));
     }
@@ -320,14 +332,20 @@ const HomePage = () => {
             Jadwal Ruangan
           </h2>
           <div className="flex gap-3 overflow-x-auto py-2">
-            {bookings.map((booking, index) => (
-              <RoomScheduleBadge
-                key={booking.id}
-                tanggal={booking.tanggalPeminjaman}
-                waktuMulai={booking.waktuMulai}
-                waktuAkhir={booking.waktuAkhir}
-              />
-            ))}
+            {bookings.length > 0 ? (
+              bookings.map((booking, index) => (
+                <RoomScheduleBadge
+                  key={booking.id}
+                  tanggal={booking.tanggalPeminjaman}
+                  waktuMulai={booking.waktuMulai}
+                  waktuAkhir={booking.waktuAkhir}
+                />
+              ))
+            ) : (
+              <p className="text-muted-foreground italic">
+                Tidak ada jadwal ruangan mendatang.
+              </p>
+            )}
           </div>
         </div>
       </div>

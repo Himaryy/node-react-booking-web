@@ -29,7 +29,7 @@ interface Props<T extends FieldValues> {
   schema: ZodType<T>;
   defaultValues: T;
   onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>;
-  type: "SIGN_IN" | "SIGN_UP";
+  type: "SIGN_IN" | "SIGN_UP" | "SIGN_ADMIN";
   loading?: boolean;
 }
 
@@ -43,6 +43,7 @@ const AuthForm = <T extends FieldValues>({
 Props<T>) => {
   // const router = useRoute
   const isSignIn = type === "SIGN_IN";
+  const isAdmin = type === "SIGN_ADMIN";
 
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -57,9 +58,12 @@ Props<T>) => {
 
     if (!result.success) {
       setSubmitError(result.error || "An error occurred. Please try again.");
+
       toast.error(
-        isSignIn
-          ? "Email atau Password Salah"
+        isAdmin
+          ? "Email atau Password Admin salah"
+          : isSignIn
+          ? "Email atau Password salah"
           : "Gagal mendaftar. Silakan coba lagi.",
         {
           richColors: true,
@@ -70,7 +74,11 @@ Props<T>) => {
 
     if (result.success) {
       toast.success(
-        isSignIn ? "Berhasil Login" : "Pendaftaran berhasil! Selamat datang.",
+        isAdmin
+          ? "Admin berhasil login"
+          : isSignIn
+          ? "Berhasil Login"
+          : "Pendaftaran berhasil! Selamat datang.",
         {
           richColors: true,
           style: { backgroundColor: "#16a34a", color: "white" },
@@ -83,7 +91,11 @@ Props<T>) => {
     <div>
       <div className="flex flex-col gap-4 pb-4">
         <h1 className="text-2xl font-semibold">
-          {isSignIn ? "Welcome Back, Mate!" : "Create Your Account"}
+          {isAdmin
+            ? "Welcome back, Admin !"
+            : isSignIn
+            ? "Welcome Back, Mate!"
+            : "Create Your Account"}
         </h1>
       </div>
 
@@ -124,10 +136,10 @@ Props<T>) => {
           <Button
             type="submit"
             disabled={loading}
-            className="inline-flex min-h-8 w-full items-center justify-center rounded-md font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-2 inline-flex min-h-8 w-full items-center justify-center rounded-md font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="flex items-center gap-2">
-              {isSignIn ? "Sign In" : "Sign Up"}
+              {isSignIn || isAdmin ? "Sign In" : "Sign Up"}
               {loading && (
                 <OrbitProgress style={{ fontSize: "4px" }} color="white" />
               )}
@@ -135,15 +147,17 @@ Props<T>) => {
           </Button>
         </form>
 
-        <p className="text-sm font-semibold text-center p-2">
-          {isSignIn ? "New User ? " : "Already have an Account ? "}
-          <Link
-            to={isSignIn ? "/sign-up" : "/sign-in"}
-            className="  text-green-700"
-          >
-            {isSignIn ? "Create an Account" : "Sign In"}
-          </Link>
-        </p>
+        {!isAdmin && (
+          <p className="text-sm font-semibold text-center p-2">
+            {isSignIn ? "New User ? " : "Already have an Account ? "}
+            <Link
+              to={isSignIn ? "/sign-up" : "/sign-in"}
+              className="  text-green-700"
+            >
+              {isSignIn ? "Create an Account" : "Sign In"}
+            </Link>
+          </p>
+        )}
       </Form>
     </div>
   );

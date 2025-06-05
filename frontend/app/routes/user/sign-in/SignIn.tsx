@@ -1,7 +1,7 @@
 import { useAuth } from "hooks/AuthProvider";
 import { signInSchema } from "lib/validations";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 import AuthForm from "~/components/AuthForm";
 
 const defaultValues = {
@@ -11,9 +11,17 @@ const defaultValues = {
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  // if (isLoading) {
+  //   return null;
+  // }
+
+  // if (user) {
+  //   return <Navigate to="/" state={{ from: location }} replace />;
+  // }
 
   const onSubmit = async (data: typeof defaultValues) => {
     setIsLoading(true);

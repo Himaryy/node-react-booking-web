@@ -119,9 +119,9 @@ const DaftarBooking = () => {
     // }
   }, [selectedBookingRoomId]);
 
-  if (isLoading) {
-    return null;
-  }
+  // if (isLoading) {
+  //   return null;
+  // }
 
   if (!user) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;

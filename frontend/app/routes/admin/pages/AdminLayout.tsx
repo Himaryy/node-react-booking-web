@@ -1,11 +1,10 @@
 import { Outlet } from "react-router";
-import Navbar from "~/components/Navbar";
+import SidebarAdmin from "~/components/SidebarAdmin";
 
 const AdminLayout = () => {
   return (
-    <div>
-      <Navbar />
-
+    <div className="flex bg-gray-900 min-h-screen">
+      <SidebarAdmin />
       <aside>
         <Outlet />
       </aside>

@@ -1,3 +1,4 @@
+import { formatTanggal, formatWaktu } from "~/lib/utils";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
@@ -8,47 +9,67 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { useState } from "react";
+import PaginationAdmin from "./PaginationAdmin";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { DatePicker } from "./DatePicker";
+import { DurationInput } from "./DurationInput";
+import { Textarea } from "./ui/textarea";
 
-// Data dummy
-const bookings = [
-  {
-    id: 1,
-    user: { name: "Mochamad Hafied" },
-    ruangan: { nama: "Ruang Rapat 1" },
-    keperluanRuangan: "Rapat Divisi",
-    tanggalPeminjaman: new Date(),
-    waktuMulai: new Date("2025-06-06T09:00:00"),
-    waktuAkhir: new Date("2025-06-06T11:00:00"),
-    durasiPeminjaman: 2,
-    status: "Submit",
-  },
-  {
-    id: 2,
-    user: { name: "Sarah Lestari" },
-    ruangan: { nama: "Aula Utama" },
-    keperluanRuangan: "Presentasi Proyek",
-    tanggalPeminjaman: new Date(),
-    waktuMulai: new Date("2025-06-07T13:00:00"),
-    waktuAkhir: new Date("2025-06-07T15:00:00"),
-    durasiPeminjaman: 2,
-    status: "Approved",
-  },
-  {
-    id: 3,
-    user: { name: "Ahmad Zaki" },
-    ruangan: { nama: "Ruang Diskusi" },
-    keperluanRuangan: "Diskusi Internal asdasdasdasdasdasdsad",
-    tanggalPeminjaman: new Date(),
-    waktuMulai: new Date("2025-06-08T10:00:00"),
-    waktuAkhir: new Date("2025-06-08T12:00:00"),
-    durasiPeminjaman: 2,
-    status: "Rejected",
-  },
-];
+interface BookingProps {
+  id: number;
+  ruangan: {
+    namaRuangan: string;
+  };
+  user: {
+    name: string;
+  };
+  keperluanRuangan: string;
+  tanggalPeminjaman: string;
+  waktuMulai: string;
+  status: string;
+  waktuAkhir: string;
+  durasiPeminjaman: number;
+}
 
-const DataTableAdmin = () => {
+interface DataTableAdminProps {
+  bookings: BookingProps[];
+}
+
+const itemsPerPage = 10;
+
+const DataTableAdmin = ({ bookings }: DataTableAdminProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [editedBooking, setEditedBooking] = useState<BookingProps | null>(null);
+
+  const totalPages = Math.ceil(bookings.length / itemsPerPage);
+  const paginatedBookings = bookings.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePagination = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
+  const handleEdit = (booking: BookingProps) => {
+    setEditedBooking(booking);
+  };
+
   return (
-    <div className="rounded-md border bg-gray-900 text-white w-full">
+    <div className="rounded-md bg-gray-900 text-white w-full">
       <Table>
         <TableHeader>
           <TableRow>
@@ -64,60 +85,130 @@ const DataTableAdmin = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {bookings.map((booking) => (
-            <TableRow key={booking.id}>
-              <TableCell>{booking.id}</TableCell>
+          {paginatedBookings.map((booking, index) => (
+            <TableRow className="text-center" key={booking.id}>
+              <TableCell>{index + 1}</TableCell>
               <TableCell className="max-w-[150px] truncate whitespace-nowrap overflow-hidden">
                 {booking.user.name}
               </TableCell>
-              <TableCell>{booking.ruangan.nama}</TableCell>
+              <TableCell>{booking.ruangan.namaRuangan}</TableCell>
               <TableCell className="max-w-[200px] truncate whitespace-nowrap overflow-hidden">
                 {booking.keperluanRuangan}
               </TableCell>
 
+              <TableCell>{formatTanggal(booking.tanggalPeminjaman)}</TableCell>
               <TableCell>
-                {new Date(booking.tanggalPeminjaman).toLocaleDateString(
-                  "id-ID"
-                )}
-              </TableCell>
-              <TableCell>
-                {formatTime(booking.waktuMulai)} -{" "}
-                {formatTime(booking.waktuAkhir)}
+                {formatWaktu(booking.waktuMulai)} -{" "}
+                {formatWaktu(booking.waktuAkhir)}
               </TableCell>
               <TableCell>{booking.durasiPeminjaman} jam</TableCell>
               <TableCell>
                 <Badge
                   variant={
                     booking.status === "Submit"
-                      ? "default"
+                      ? "submit"
                       : booking.status === "Approved"
-                      ? "outline"
+                      ? "approved"
                       : booking.status === "Rejected"
                       ? "destructive"
-                      : "secondary"
+                      : "default"
                   }
                 >
                   {booking.status}
                 </Badge>
               </TableCell>
               <TableCell>
-                <Button variant="ghost" className="text-xs">
-                  Detail
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => handleEdit(booking)}
+                      variant="secondary"
+                      className="text-xs"
+                    >
+                      <FaEdit />
+                    </Button>
+                  </DialogTrigger>
+
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>
+                        Edit Booking {booking.user.name}
+                      </DialogTitle>
+                      <DialogDescription>
+                        Edit detail peminjaman ruangan
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    {/* Form content */}
+                    <div className="flex flex-col gap-4 mt-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col">
+                          <Label>Nama Peminjam</Label>
+                          <Input
+                            value={editedBooking?.user?.name ?? ""}
+                            onChange={(e) =>
+                              setEditedBooking((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      user: {
+                                        ...prev.user,
+                                        name: e.target.value,
+                                      },
+                                    }
+                                  : null
+                              )
+                            }
+                            className="bg-gray-100 text-black"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <Label>Nama Ruangan</Label>
+                          <Input
+                            value={booking.ruangan.namaRuangan}
+                            className="bg-gray-100 text-black"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col">
+                        <Label>Durasi Peminjaman</Label>
+                        <div className="flex items-center gap-2">
+                          <DurationInput
+                            value={booking.durasiPeminjaman}
+                            onChange={() => {}}
+                          />
+                          <span className="text-sm">Jam</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col">
+                        <Label>Keperluan Ruangan</Label>
+                        <Textarea
+                          value={booking.keperluanRuangan}
+                          className="bg-gray-100 text-black"
+                        />
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <Button variant="destructive" className="text-xs ml-2">
+                  <MdDelete />
                 </Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* pagination */}
+      <PaginationAdmin
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePagination}
+      />
     </div>
   );
-};
-
-const formatTime = (time: Date) => {
-  return time.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 };
 
 export default DataTableAdmin;

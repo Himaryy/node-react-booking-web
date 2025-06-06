@@ -112,7 +112,20 @@ export const getAllBookingByAdmin = async (
       });
     }
 
-    const allBooking = await prisma.booking.findMany();
+    const allBooking = await prisma.booking.findMany({
+      include: {
+        ruangan: {
+          select: {
+            namaRuangan: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
     return res.status(200).json({
       success: true,

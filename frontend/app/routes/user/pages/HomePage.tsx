@@ -15,7 +15,7 @@ import { DurationInput } from "~/components/DurationInput";
 import { toast } from "sonner";
 import { DateTime } from "luxon";
 import { createBookingSchema } from "lib/validations";
-import { FileWarning } from "lucide-react";
+import { Clock, FileWarning } from "lucide-react";
 import { withMinimumLoading } from "utils/MinimumTime";
 
 interface RoomsProps {
@@ -271,6 +271,9 @@ const HomePage = () => {
               setDate={setStartTimeInput}
               disabled={isDisabled}
             />
+            <div className="flex items-center">
+              <Clock className="w-4 h-4" />
+            </div>
           </div>
 
           {/* Durasi */}

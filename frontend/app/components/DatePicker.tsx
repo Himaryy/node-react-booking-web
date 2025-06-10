@@ -17,9 +17,15 @@ interface DatePickerProps {
   value?: Date;
   onChange?: (date: Date) => void;
   disabled?: boolean;
+  className?: string;
 }
 
-export function DatePicker({ value, onChange, disabled }: DatePickerProps) {
+export function DatePicker({
+  value,
+  onChange,
+  disabled,
+  className,
+}: DatePickerProps) {
   const [date, setDate] = useState<Date | undefined>(value);
 
   useEffect(() => {
@@ -40,7 +46,8 @@ export function DatePicker({ value, onChange, disabled }: DatePickerProps) {
           variant={"outline"}
           className={cn(
             "w-[200px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
+            className
           )}
         >
           <CalendarIcon />

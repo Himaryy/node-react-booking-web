@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 
 interface DurationInputProps {
@@ -16,35 +16,51 @@ export function DurationInput({
   max = 12,
   disabled,
 }: DurationInputProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const valStr = e.target.value;
+  const [flag, setFlag] = useState(false);
+  const [prevDigit, setPrevDigit] = useState("0");
 
-    // Izinkan input kosong
-    if (valStr === "") {
-      onChange(undefined);
+  useEffect(() => {
+    if (flag) {
+      const timer = setTimeout(() => setFlag(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [flag]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
       return;
     }
 
-    // Konversi string ke number
-    let val = parseInt(valStr, 10);
+    if (e.key >= "0" && e.key <= "9") {
+      e.preventDefault();
+      let newValue: number;
 
-    if (isNaN(val)) return;
+      if (!flag) {
+        // First digit, store it temporarily
+        setPrevDigit(e.key);
+        newValue = parseInt(e.key, 10);
+      } else {
+        // Combine with previous digit
+        newValue = parseInt(prevDigit + e.key, 10);
+      }
 
-    // Batasi antara min dan max
-    if (val < min) val = min;
-    if (val > max) val = max;
+      // Clamp between min and max
+      if (newValue > max) newValue = max;
+      if (newValue < min) newValue = min;
 
-    onChange(val);
+      onChange(newValue);
+      setFlag(!flag);
+    }
   };
 
   return (
     <Input
-      type="number"
-      min={min}
-      max={max}
+      type="text"
       inputMode="numeric"
       value={value === undefined ? "" : value}
-      onChange={handleChange}
+      onKeyDown={handleKeyDown}
+      onChange={() => {}}
       disabled={disabled}
       className="w-[48px] text-center font-mono text-base tabular-nums focus:outline-none focus:ring focus:ring-accent caret-black appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
     />

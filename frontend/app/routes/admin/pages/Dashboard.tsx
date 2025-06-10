@@ -173,7 +173,7 @@ const Dashboard = () => {
 
       <div className="w-full p-6 space-y-6">
         <h1 className="text-2xl font-bold text-white">Dashboard Admin</h1>
-
+        {/* <pre>{JSON.stringify(bookingRooms, null, 2)}</pre> */}
         {loading ? <CardAdminSkeleton /> : <CardAdmin stats={statCount} />}
 
         <div className="bg-gray-800 p-4 rounded-lg shadow text-white">

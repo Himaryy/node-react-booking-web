@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useAuth } from "hooks/AuthProvider";
-import { FileWarning } from "lucide-react";
+import { Clock, FileWarning } from "lucide-react";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
@@ -312,6 +312,9 @@ const DaftarBooking = () => {
             setDate={setStartTime}
             disabled={isDisabled}
           />
+          <div className="flex items-center">
+            <Clock className="w-4 h-4" />
+          </div>
         </div>
 
         {/* Durasi */}

@@ -18,19 +18,24 @@ export const createBooking = async (
 
   try {
     // const waktuMulaiDate = new Date(waktuMulai); // UTC
+    const tanggalMulai = DateTime.fromISO(tanggalPeminjaman, {
+      zone: "Asia/Jakarta",
+    });
     const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
       zone: "Asia/Jakarta",
     });
 
-    const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
+    // Gabung tanggal mulai dan waktu mulai
+    const tanggalWaktuMulai = tanggalMulai.set({
+      hour: waktuMulaiDate.hour,
+      minute: waktuMulaiDate.minute,
+      second: 0,
+      millisecond: 0,
+    });
+
+    const waktuAkhirDate = tanggalWaktuMulai.plus({ hours: durasiPeminjaman });
 
     const userId = req.user?.id;
-
-    // const user = await prisma.user.findFirst({
-    //   where: {
-    //     id: userId,
-    //   },
-    // });
 
     if (!userId) {
       return res.status(404).json({
@@ -42,9 +47,14 @@ export const createBooking = async (
     const newBooking = await prisma.booking.create({
       data: {
         keperluanRuangan,
-        tanggalPeminjaman: new Date(tanggalPeminjaman),
-        waktuMulai: waktuMulaiDate.toJSDate(), // ✅ pastikan ini
-        waktuAkhir: waktuAkhirDate.toJSDate(), // ✅ pastikan ini
+        // tanggalPeminjaman: new Date(tanggalPeminjaman),
+        tanggalPeminjaman: tanggalWaktuMulai
+          .setZone("UTC", { keepLocalTime: true })
+          .startOf("day")
+          .toJSDate(),
+
+        waktuMulai: tanggalWaktuMulai.toJSDate(), // ✅ ini yang fix
+        waktuAkhir: waktuAkhirDate.toJSDate(),
         durasiPeminjaman,
         status: "Submit",
         userId,
@@ -116,6 +126,7 @@ export const getAllBookingByAdmin = async (
       include: {
         ruangan: {
           select: {
+            id: true,
             namaRuangan: true,
           },
         },
@@ -249,10 +260,21 @@ export const updateBookingByAdmin = async (
   } = req.body;
 
   try {
+    const tanggalMulai = DateTime.fromISO(tanggalPeminjaman, {
+      zone: "Asia/Jakarta",
+    });
     const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
       zone: "Asia/Jakarta",
     });
-    const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
+
+    const tanggalWaktuMulai = tanggalMulai.set({
+      hour: waktuMulaiDate.hour,
+      minute: waktuMulaiDate.minute,
+      second: 0,
+      millisecond: 0,
+    });
+
+    const waktuAkhirDate = tanggalWaktuMulai.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);
     console.log(bookingId);
@@ -271,9 +293,12 @@ export const updateBookingByAdmin = async (
         where: {
           id: { not: bookingId },
           ruanganId,
-          // namaRuangan,
-          tanggalPeminjaman: new Date(tanggalPeminjaman),
           status: "Approved",
+          // namaRuangan,
+          tanggalPeminjaman: {
+            gte: tanggalWaktuMulai.startOf("day").toJSDate(),
+            lt: tanggalWaktuMulai.endOf("day").toJSDate(),
+          },
           AND: [
             { waktuMulai: { lt: waktuAkhirDate.toJSDate() } },
             { waktuAkhir: { gt: waktuMulaiDate.toJSDate() } },
@@ -296,8 +321,11 @@ export const updateBookingByAdmin = async (
       },
       data: {
         keperluanRuangan,
-        tanggalPeminjaman: new Date(tanggalPeminjaman),
-        waktuMulai: waktuMulaiDate.toJSDate(),
+        tanggalPeminjaman: tanggalWaktuMulai
+          .setZone("UTC", { keepLocalTime: true })
+          .startOf("day")
+          .toJSDate(),
+        waktuMulai: tanggalWaktuMulai.toJSDate(), // ✅ ini yang fix
         waktuAkhir: waktuAkhirDate.toJSDate(),
         durasiPeminjaman,
         status: status,
@@ -326,6 +354,42 @@ export const updateBookingByAdmin = async (
   }
 };
 
+export const getBookingByDateAndRoomByAdmin = async (req, res) => {
+  const { tanggalPeminjaman, ruanganId } = req.query;
+
+  try {
+    const tanggal = new Date(tanggalPeminjaman);
+    const startOfDay = new Date(tanggal.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(tanggal.setHours(24, 0, 0, 0));
+
+    const bookings = await prisma.booking.findMany({
+      where: {
+        ruanganId: parseInt(ruanganId),
+        tanggalPeminjaman: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+        status: "Approved",
+      },
+      select: {
+        id: true,
+        user: { select: { name: true } },
+        waktuMulai: true,
+        waktuAkhir: true,
+        status: true,
+      },
+    });
+
+    return res.json({ success: true, data: bookings });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error when get data by date and room by admin",
+    });
+  }
+};
+
 export const updateBookingByUser = async (
   /** @type import('express').Request */ req,
   /** @type import('express').Response */ res
@@ -339,10 +403,22 @@ export const updateBookingByUser = async (
   } = req.body;
 
   try {
+    const tanggalMulai = DateTime.fromISO(tanggalPeminjaman, {
+      zone: "Asia/Jakarta",
+    });
     const waktuMulaiDate = DateTime.fromISO(waktuMulai, {
-      zone: "utc",
-    }).setZone("Asia/Jakarta");
-    const waktuAkhirDate = waktuMulaiDate.plus({ hours: durasiPeminjaman });
+      zone: "Asia/Jakarta",
+    });
+
+    // Gabung tanggal mulai dan waktu mulai
+    const tanggalWaktuMulai = tanggalMulai.set({
+      hour: waktuMulaiDate.hour,
+      minute: waktuMulaiDate.minute,
+      second: 0,
+      millisecond: 0,
+    });
+
+    const waktuAkhirDate = tanggalWaktuMulai.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);
     console.log(bookingId);
@@ -380,8 +456,11 @@ export const updateBookingByUser = async (
       },
       data: {
         keperluanRuangan,
-        tanggalPeminjaman: new Date(tanggalPeminjaman),
-        waktuMulai: waktuMulaiDate.toJSDate(),
+        tanggalPeminjaman: tanggalWaktuMulai
+          .setZone("UTC", { keepLocalTime: true })
+          .startOf("day")
+          .toJSDate(),
+        waktuMulai: tanggalWaktuMulai.toJSDate(), // ✅ ini yang fix
         waktuAkhir: waktuAkhirDate.toJSDate(),
         durasiPeminjaman,
         status: "Submit",

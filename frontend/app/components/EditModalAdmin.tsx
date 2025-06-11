@@ -24,10 +24,12 @@ import {
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import type { Dispatch, SetStateAction } from "react";
+import { OrbitProgress } from "react-loading-indicators";
 
 interface BookingProps {
   id: number;
   ruangan: {
+    id: number;
     namaRuangan: string;
   };
   user: {
@@ -53,6 +55,7 @@ interface EditModalProps {
   status: string;
   setStatus: Dispatch<SetStateAction<string>>;
   editedBooking: BookingProps | null;
+  isLoading: boolean;
   setEditedBooking: Dispatch<SetStateAction<BookingProps | null>>;
   onSave: () => void;
 }
@@ -68,10 +71,12 @@ const EditModalAdmin = ({
   setDurationTime,
   status,
   setStatus,
+  isLoading,
   editedBooking,
   setEditedBooking,
   onSave,
 }: EditModalProps) => {
+  // console.log(status);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -84,37 +89,45 @@ const EditModalAdmin = ({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="bg-gray-900">
+      <DialogContent className="bg-gray-900 text-gray-100 border border-gray-700">
         <DialogHeader>
           <DialogTitle>Edit Booking {booking.user.name}</DialogTitle>
-          <DialogDescription>Edit detail peminjaman ruangan</DialogDescription>
+          <DialogDescription className="text-gray-400">
+            Edit detail peminjaman ruangan
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <Label className="mb-2">Nama Peminjam</Label>
-              <Input value={booking?.user?.name ?? ""} readOnly />
+              <Label className="mb-2 text-gray-300">Nama Peminjam</Label>
+              <Input
+                className="bg-gray-800 border-gray-600 text-gray-100"
+                value={booking?.user?.name ?? ""}
+                readOnly
+              />
             </div>
             <div className="flex flex-col">
-              <Label className="mb-2">Nama Ruangan</Label>
-              <Input value={booking?.ruangan?.namaRuangan} readOnly />
+              <Label className="mb-2 text-gray-300">Nama Ruangan</Label>
+              <Input
+                className="bg-gray-800 border-gray-600 text-gray-100"
+                value={booking?.ruangan?.namaRuangan}
+                readOnly
+              />
             </div>
           </div>
 
-          <div className="flex gap-4 ">
+          <div className="flex gap-4">
             <div className="flex flex-col">
-              <Label className="mb-2">Tanggal</Label>
+              <Label className="mb-2 text-gray-300">Tanggal</Label>
               <DatePicker
+                className="bg-gray-800 border-gray-600 text-gray-100 hover:bg-gray-800 hover:text-gray-100"
                 value={date}
                 onChange={(newDate: Date) => {
                   setDate(newDate);
                   setEditedBooking((prev: any) =>
                     prev
-                      ? {
-                          ...prev,
-                          tanggalPeminjaman: newDate.toISOString(),
-                        }
+                      ? { ...prev, tanggalPeminjaman: newDate?.toISOString() }
                       : null
                   );
                 }}
@@ -122,62 +135,85 @@ const EditModalAdmin = ({
             </div>
 
             <div className="flex flex-col">
-              <Label className="mb-2">Jam</Label>
+              <Label className="mb-2 text-gray-300">Jam</Label>
               <div className="flex items-center gap-2">
                 <TimePicker
-                  className="w-full"
+                  inputClassName="bg-gray-800 border-gray-600 caret-gray-100"
                   date={startTime}
-                  setDate={setStartTime}
+                  setDate={(newStartTime) => {
+                    setStartTime(newStartTime);
+
+                    setEditedBooking((prev: any) =>
+                      prev
+                        ? { ...prev, waktuMulai: newStartTime?.toISOString() }
+                        : null
+                    );
+                  }}
                 />
-                {/* <span className="text-gray-700">-</span> */}
-                {/* <TimePicker
-                  className="w-full"
-                  date={endTime}
-                  setDate={setEndTime}
-                /> */}
               </div>
             </div>
 
             <div className="flex flex-col">
-              <Label className="mb-2">Durasi</Label>
+              <Label className="mb-2 text-gray-300">Durasi</Label>
               <div className="flex items-center gap-2">
                 <DurationInput
+                  className="bg-gray-800 border-gray-600"
                   value={durationTime}
-                  onChange={setDurationTime}
+                  onChange={(newDuration: number | undefined) => {
+                    setDurationTime(newDuration);
+
+                    setEditedBooking((prev: any) =>
+                      prev
+                        ? {
+                            ...prev,
+                            durasiPeminjaman: newDuration,
+                          }
+                        : null
+                    );
+                  }}
                 />
-                <span className="text-sm">Jam</span>
+                <span className="text-sm text-gray-300">Jam</span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <Label className="mb-2">Status Peminjaman</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="bg-white border border-gray-300 text-gray-900 w-[180px] rounded-lg">
+              <Label className="mb-2 text-gray-300">Status Peminjaman</Label>
+              <Select
+                value={status}
+                onValueChange={(newStatus) => {
+                  setStatus(newStatus);
+
+                  setEditedBooking((prev: any) =>
+                    prev ? { ...prev, status: newStatus } : null
+                  );
+                }}
+              >
+                <SelectTrigger className="bg-gray-800 border border-gray-600 text-gray-100 w-[180px] rounded-lg">
                   <SelectValue placeholder="Pilih status" />
                 </SelectTrigger>
 
-                <SelectContent className="bg-white text-gray-900 border border-gray-300 shadow-md">
+                <SelectContent className="bg-gray-800 text-gray-100 border border-gray-600 shadow-md">
                   <SelectGroup>
-                    <SelectLabel className="text-sm font-semibold text-gray-700 px-2 py-1">
+                    <SelectLabel className="text-sm font-semibold text-gray-300 px-2 py-1">
                       Status Peminjaman
                     </SelectLabel>
                     <SelectItem
                       value="Submit"
-                      className="hover:bg-gray-200 cursor-pointer text-sm "
+                      className="hover:bg-gray-700 cursor-pointer text-sm"
                     >
                       Submit
                     </SelectItem>
                     <SelectItem
                       value="Approved"
-                      className="hover:bg-gray-200 cursor-pointer text-sm "
+                      className="hover:bg-gray-700 cursor-pointer text-sm"
                     >
                       Approved
                     </SelectItem>
                     <SelectItem
                       value="Rejected"
-                      className="hover:bg-gray-200 cursor-pointer text-sm"
+                      className="hover:bg-gray-700 cursor-pointer text-sm"
                     >
                       Rejected
                     </SelectItem>
@@ -188,16 +224,28 @@ const EditModalAdmin = ({
           </div>
 
           <div className="flex flex-col">
-            <Label className="mb-2">Keperluan Ruangan</Label>
-            <Textarea className="shadow-sm" value={booking.keperluanRuangan} />
+            <Label className="mb-2 text-gray-300">Keperluan Ruangan</Label>
+            <Textarea
+              className="bg-gray-800 border-gray-600 text-gray-100 shadow-sm"
+              value={booking.keperluanRuangan}
+              readOnly
+            />
           </div>
         </div>
 
         <Button
           onClick={onSave}
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+          disabled={isLoading}
+          className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50 mt-4"
         >
-          Simpan Perubahan
+          <span className="flex items-center gap-2">
+            Simpan Perubahan
+            <span>
+              {isLoading && (
+                <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+              )}
+            </span>
+          </span>
         </Button>
       </DialogContent>
     </Dialog>

@@ -10,6 +10,7 @@ interface TimePickerProps {
   setDate: (date: Date | undefined) => void;
   disabled?: boolean;
   className?: string;
+  inputClassName?: string;
 }
 
 export function TimePicker({
@@ -17,17 +18,18 @@ export function TimePicker({
   setDate,
   disabled,
   className,
+  inputClassName,
 }: TimePickerProps) {
   const minuteRef = React.useRef<HTMLInputElement>(null);
   const hourRef = React.useRef<HTMLInputElement>(null);
   const secondRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn("flex items-center gap-2", className)}>
       {/* <Label htmlFor="hours" className="text-xs">
         Hour
       </Label> */}
-      <div className={cn("grid gap-1 text-center", className)}>
+      <div className="grid gap-1 text-center">
         <TimePickerInput
           placeholder="HH"
           picker="hours"
@@ -36,10 +38,11 @@ export function TimePicker({
           ref={hourRef}
           onRightFocus={() => minuteRef.current?.focus()}
           disabled={disabled}
+          className={inputClassName}
         />
       </div>
       <p>:</p>
-      <div className={cn("grid gap-1 text-center", className)}>
+      <div className="grid gap-1 text-center">
         {/* <Label htmlFor="minutes" className="text-xs ">
           Minute
         </Label> */}
@@ -51,23 +54,9 @@ export function TimePicker({
           onLeftFocus={() => hourRef.current?.focus()}
           onRightFocus={() => secondRef.current?.focus()}
           disabled={disabled}
+          className={inputClassName}
         />
       </div>
-      {/* <div className="grid gap-1 text-center">
-        <Label htmlFor="seconds" className="text-xs">
-          Seconds
-        </Label>
-        <TimePickerInput
-          picker="seconds"
-          date={date}
-          setDate={setDate}
-          ref={secondRef}
-          onLeftFocus={() => minuteRef.current?.focus()}
-        />
-      </div> */}
-      {/* <div className="flex h-10 items-center">
-        <Clock className="ml-2 h-4 w-4" />
-      </div> */}
     </div>
   );
 }

@@ -134,10 +134,20 @@ const HomePage = () => {
       keperluan,
     });
 
+    const tanggal = DateTime.fromJSDate(dateInput);
+    const waktu = DateTime.fromJSDate(startTimeInput);
+
+    const waktuMulaiGabungan = tanggal.set({
+      hour: waktu.hour,
+      minute: waktu.minute,
+      second: 0,
+      millisecond: 0,
+    });
+
     const bookingData: createBookingProps = {
       ruanganId: selectedRoom.id,
-      tanggalPeminjaman: DateTime.fromJSDate(dateInput).toISODate()!,
-      waktuMulai: DateTime.fromJSDate(startTimeInput).toISO()!,
+      tanggalPeminjaman: tanggal.toISODate()!,
+      waktuMulai: waktuMulaiGabungan.toISO()!,
       durasiPeminjaman: durationTimeInput,
       keperluanRuangan: keperluan,
     };

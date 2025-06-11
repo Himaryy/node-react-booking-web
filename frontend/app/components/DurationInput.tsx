@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
+import { cn } from "~/lib/utils";
 
 interface DurationInputProps {
   value?: number;
@@ -7,6 +8,7 @@ interface DurationInputProps {
   min?: number;
   max?: number;
   disabled?: boolean;
+  className?: string;
 }
 
 export function DurationInput({
@@ -15,6 +17,7 @@ export function DurationInput({
   min = 0,
   max = 12,
   disabled,
+  className,
 }: DurationInputProps) {
   const [flag, setFlag] = useState(false);
   const [prevDigit, setPrevDigit] = useState("0");
@@ -62,7 +65,10 @@ export function DurationInput({
       onKeyDown={handleKeyDown}
       onChange={() => {}}
       disabled={disabled}
-      className="w-[48px] text-center font-mono text-base tabular-nums focus:outline-none focus:ring focus:ring-accent caret-black appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      className={cn(
+        "w-[48px] text-center font-mono text-base tabular-nums focus:outline-none focus:ring focus:ring-accent caret-black appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+        className
+      )}
     />
   );
 }

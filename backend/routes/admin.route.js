@@ -10,6 +10,7 @@ import {
 } from "../controllers/ruangan.controller.js";
 import {
   getAllBookingByAdmin,
+  getBookingByDateAndRoomByAdmin,
   updateBookingByAdmin,
 } from "../controllers/booking.controller.js";
 import {
@@ -35,5 +36,11 @@ router.get("/ruangan/:id", getRuangan);
 // Booking
 router.get("/booking-admin", isAuthenticated, isAdmin, getAllBookingByAdmin);
 router.patch("/booking-admin/:id", isAuthenticated, updateBookingByAdmin);
+router.get(
+  "/bookings-date-room",
+  isAuthenticated,
+  isAdmin,
+  getBookingByDateAndRoomByAdmin
+);
 
 export default router;

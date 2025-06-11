@@ -26,42 +26,38 @@ export function DatePicker({
   disabled,
   className,
 }: DatePickerProps) {
-  const [date, setDate] = useState<Date | undefined>(value);
-
-  useEffect(() => {
-    setDate(value);
-  }, [value]);
-
-  const handleSelectDate = (selected: Date | undefined) => {
-    if (!selected) return;
-    if (onChange) onChange(selected);
-  };
-
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          disabled={disabled}
-          // value={date ? date.toISOString().split("T")[0] : ""}
-          variant={"outline"}
-          className={cn(
-            "w-[200px] justify-start text-left font-normal",
-            !date && "text-muted-foreground",
-            className
-          )}
+    <div className="relative">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            disabled={disabled}
+            variant={"outline"}
+            className={cn(
+              "w-[200px] justify-start text-left font-normal",
+              !value && "text-muted-foreground",
+              className
+            )}
+          >
+            <CalendarIcon />
+            {value ? format(value, "PPP") : <span>Pilih tanggal</span>}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent
+          className="z-[100] w-auto p-0 pointer-events-auto"
+          align="start"
         >
-          <CalendarIcon />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleSelectDate}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={(date) => {
+              if (date && onChange) onChange(date);
+            }}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

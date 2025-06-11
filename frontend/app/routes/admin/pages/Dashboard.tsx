@@ -14,6 +14,7 @@ import DataTableSkeleton from "~/components/DataTableAdminSkeleton";
 interface BookingProps {
   id: number;
   ruangan: {
+    id: number;
     namaRuangan: string;
   };
   user: {
@@ -173,7 +174,9 @@ const Dashboard = () => {
 
       <div className="w-full p-6 space-y-6">
         <h1 className="text-2xl font-bold text-white">Dashboard Admin</h1>
-        {/* <pre>{JSON.stringify(bookingRooms, null, 2)}</pre> */}
+        {/* <pre className="text-white">
+          {JSON.stringify(bookingRooms, null, 2)}
+        </pre> */}
         {loading ? <CardAdminSkeleton /> : <CardAdmin stats={statCount} />}
 
         <div className="bg-gray-800 p-4 rounded-lg shadow text-white">
@@ -183,7 +186,10 @@ const Dashboard = () => {
         {loading ? (
           <DataTableSkeleton />
         ) : (
-          <DataTableAdmin bookings={bookingRooms} />
+          <DataTableAdmin
+            bookings={bookingRooms}
+            setBookings={setBookingRooms}
+          />
         )}
       </div>
     </div>

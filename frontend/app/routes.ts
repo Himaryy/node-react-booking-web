@@ -8,6 +8,7 @@ export default [
 
   layout("routes/admin/pages/AdminLayout.tsx", [
     route("/dashboard", "routes/admin/pages/Dashboard.tsx"),
+    route("/tambah-ruangan", "routes/admin/pages/TambahRuangan.tsx"),
   ]),
 
   // User

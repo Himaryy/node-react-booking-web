@@ -45,8 +45,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    fetchUser(); // ambil user saat awal load (jika sudah login via cookie)
-    fetchAdmin();
+    fetchUser();
+
+    const path = window.location.pathname;
+    const isAdminPage = ["/dashboard", "/login-admin"].some((prefix) =>
+      path.startsWith(prefix)
+    );
+
+    if (isAdminPage) {
+      fetchAdmin();
+    }
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {

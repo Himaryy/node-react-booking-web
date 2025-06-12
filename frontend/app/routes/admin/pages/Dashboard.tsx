@@ -173,7 +173,14 @@ const Dashboard = () => {
       {/* Main Content */}
 
       <div className="w-full p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-white">Dashboard Admin</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-white">
+            Welcome, {admin.name}{" "}
+          </h1>
+          <p className="font-semibold text-muted-foreground text-lg">
+            Have a nice day
+          </p>
+        </div>
         {/* <pre className="text-white">
           {JSON.stringify(bookingRooms, null, 2)}
         </pre> */}

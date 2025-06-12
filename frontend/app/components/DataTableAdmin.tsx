@@ -53,6 +53,7 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
   const [editedBooking, setEditedBooking] = useState<BookingProps | null>(null);
   const [statusBooking, setStatusBooking] = useState<string>("Submit");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDeleted, setIsLoadingDeleted] = useState(false);
 
   const totalPages = Math.ceil(bookings.length / itemsPerPage);
   const paginatedBookings = bookings.slice(
@@ -175,9 +176,6 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
         return;
       }
 
-      console.log("Status yg akan diset:", statusBooking);
-      console.log("Bentrok?", existingBookings);
-
       if (statusBooking === "Approved" && isConflict) {
         toast.error("Booking Bentrok", {
           description: `Ruangan telah dibooking oleh "${isConflict.user?.name}" dan sudah di Approve`,
@@ -258,6 +256,49 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
     }
   };
 
+  const handleDelete = async (booking: BookingProps) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("Token not found");
+        return;
+      }
+
+      await withMinimumLoading(
+        async () => {
+          await axios.delete(
+            `http://localhost:8000/admin/booking-admin/${booking.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        },
+        setIsLoadingDeleted,
+        1000
+      );
+
+      // Auto delete data without refresh page
+      setBookings((prev) => prev.filter((b) => b.id !== booking.id));
+
+      toast.success("Delete Booking", {
+        description: `Booking by ${booking.user?.name} berhasil di hapus !`,
+        richColors: true,
+        style: { backgroundColor: "#16a34a", color: "white" }, // bit green
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Error Delete Booking", {
+        description: "Terjadi kesalahan saat melakukan delete booking.",
+        richColors: true,
+        style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+        icon: <FileWarning className="text-white" />,
+      });
+    }
+  };
+
   return (
     <div className="rounded-md text-white w-full">
       <Table>
@@ -325,9 +366,13 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
                     isLoading={isLoading}
                     editedBooking={editedBooking}
                     setEditedBooking={setEditedBooking}
-                    onSave={() => handleSave(booking)}
+                    onSave={handleSave}
                   />
-                  <DeleteModalAdmin />
+                  <DeleteModalAdmin
+                    isLoading={isLoadingDeleted}
+                    booking={booking}
+                    onDelete={handleDelete}
+                  />
                 </div>
               </TableCell>
             </TableRow>

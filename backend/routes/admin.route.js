@@ -9,6 +9,7 @@ import {
   updateRuangan,
 } from "../controllers/ruangan.controller.js";
 import {
+  deleteBooking,
   getAllBookingByAdmin,
   getBookingByDateAndRoomByAdmin,
   updateBookingByAdmin,
@@ -42,5 +43,6 @@ router.get(
   isAdmin,
   getBookingByDateAndRoomByAdmin
 );
+router.delete("/booking-admin/:id", isAuthenticated, isAdmin, deleteBooking);
 
 export default router;

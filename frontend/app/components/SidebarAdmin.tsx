@@ -4,7 +4,7 @@ import { SlLogout } from "react-icons/sl";
 import { OrbitProgress } from "react-loading-indicators";
 import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { MdOutlineMeetingRoom } from "react-icons/md";
+import { MdOutlineDashboard, MdOutlineMeetingRoom } from "react-icons/md";
 
 const SidebarAdmin = () => {
   const { admin, logoutAdmin } = useAuth();
@@ -35,9 +35,21 @@ const SidebarAdmin = () => {
         <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
         <nav className="flex flex-col gap-2">
           <Link
+            to="/dashboard"
+            className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${
+              location.pathname === "/dashboard"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-300 hover:bg-gray-700 hover:text-white"
+            }`}
+          >
+            <MdOutlineDashboard className="w-5 h-5" />
+            <span>Dashboard</span>
+          </Link>
+
+          <Link
             to="/tambah-ruangan"
             className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${
-              isActive
+              location.pathname === "/tambah-ruangan"
                 ? "bg-gray-700 text-white font-semibold"
                 : "text-gray-300 hover:bg-gray-700 hover:text-white"
             }`}

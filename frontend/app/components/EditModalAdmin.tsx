@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { OrbitProgress } from "react-loading-indicators";
 
 interface BookingProps {
@@ -57,7 +57,7 @@ interface EditModalProps {
   editedBooking: BookingProps | null;
   isLoading: boolean;
   setEditedBooking: Dispatch<SetStateAction<BookingProps | null>>;
-  onSave: () => void;
+  onSave: (booking: BookingProps) => Promise<void>;
 }
 
 const EditModalAdmin = ({
@@ -75,13 +75,17 @@ const EditModalAdmin = ({
   editedBooking,
   setEditedBooking,
   onSave,
-}: EditModalProps) => {
+}: Omit<EditModalProps, "isOpen" | "onOpenChange">) => {
   // console.log(status);
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          onClick={() => handleEdit(booking)}
+          onClick={() => {
+            handleEdit(booking);
+            setIsOpen(true);
+          }}
           variant="secondary"
           className="text-xs"
         >
@@ -91,7 +95,7 @@ const EditModalAdmin = ({
 
       <DialogContent className="bg-gray-900 text-gray-100 border border-gray-700">
         <DialogHeader>
-          <DialogTitle>Edit Booking {booking.user.name}</DialogTitle>
+          <DialogTitle>Edit Booking for "{booking.user.name}"</DialogTitle>
           <DialogDescription className="text-gray-400">
             Edit detail peminjaman ruangan
           </DialogDescription>
@@ -234,7 +238,10 @@ const EditModalAdmin = ({
         </div>
 
         <Button
-          onClick={onSave}
+          onClick={async () => {
+            await onSave(booking); // tunggu proses simpan selesai
+            setIsOpen(false); // tutup modal
+          }}
           disabled={isLoading}
           className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50 mt-4"
         >

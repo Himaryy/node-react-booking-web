@@ -96,8 +96,8 @@ const Dashboard = () => {
         );
       } catch (error) {
         console.error("Error fetching rooms:", error);
-        toast.error("Gagal memuat data ruangan", {
-          description: "Terjadi kesalahan saat mengambil data ruangan.",
+        toast.error("Gagal memuat data booking", {
+          description: "Terjadi kesalahan saat mengambil data booking.",
           richColors: true,
           style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
           icon: <FileWarning className="text-white" />,
@@ -165,7 +165,7 @@ const Dashboard = () => {
   if (isLoadingAdmin) return null;
 
   if (!admin) {
-    return <Navigate to="/login-admin" state={{ from: location }} replace />;
+    return <Navigate to="/login-admin" />;
   }
 
   return (
@@ -174,10 +174,10 @@ const Dashboard = () => {
 
       <div className="w-full p-6 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-white mb-2">
             Welcome, {admin.name}{" "}
           </h1>
-          <p className="font-semibold text-muted-foreground text-lg">
+          <p className="font-semibold text-muted-foreground text-sm">
             Have a nice day
           </p>
         </div>

@@ -48,8 +48,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fetchUser();
 
     const path = window.location.pathname;
-    const isAdminPage = ["/dashboard", "/login-admin"].some((prefix) =>
-      path.startsWith(prefix)
+    const isAdminPage = ["/dashboard", "/login-admin", "/tambah-ruangan"].some(
+      (prefix) => path.startsWith(prefix)
     );
 
     if (isAdminPage) {

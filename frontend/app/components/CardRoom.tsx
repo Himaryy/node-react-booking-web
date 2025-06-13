@@ -2,7 +2,7 @@ import { cn } from "~/lib/utils";
 
 interface Props {
   title: string;
-  imageUrl: string;
+  imageUrl?: string;
   status?: string;
   selected?: boolean;
   onSelected: () => void;

@@ -156,38 +156,38 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
     newEndTime.setHours(newEndTime.getHours() + durationTime);
 
     try {
-      const existingBookings = await fetchBookingByDateAndRoom(
-        date,
-        booking.ruangan?.id
-      );
-
-      const isConflict = getScheduleConflictBooking(
-        newStartTime,
-        newEndTime,
-        existingBookings,
-        booking?.id
-      );
-
-      if (!existingBookings) {
-        toast.error("Gagal cek bentrok", {
-          description: "Tidak bisa memeriksa jadwal booking saat ini.",
-          richColors: true,
-        });
-        return;
-      }
-
-      if (statusBooking === "Approved" && isConflict) {
-        toast.error("Booking Bentrok", {
-          description: `Ruangan telah dibooking oleh "${isConflict.user?.name}" dan sudah di Approve`,
-          richColors: true,
-          style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
-          icon: <FileWarning className="text-white" />,
-        });
-        return;
-      }
-
       await withMinimumLoading(
         async () => {
+          const existingBookings = await fetchBookingByDateAndRoom(
+            date,
+            booking.ruangan?.id
+          );
+
+          const isConflict = getScheduleConflictBooking(
+            newStartTime,
+            newEndTime,
+            existingBookings,
+            booking?.id
+          );
+
+          if (!existingBookings) {
+            toast.error("Gagal cek bentrok", {
+              description: "Tidak bisa memeriksa jadwal booking saat ini.",
+              richColors: true,
+            });
+            return;
+          }
+
+          if (statusBooking === "Approved" && isConflict) {
+            toast.error("Booking Bentrok", {
+              description: `Ruangan telah dibooking oleh "${isConflict.user?.name}" dan sudah di Approve`,
+              richColors: true,
+              style: { backgroundColor: "#dc2626", color: "white" }, // bit dark red
+              icon: <FileWarning className="text-white" />,
+            });
+            return;
+          }
+
           const token = localStorage.getItem("token");
 
           if (!token) {

@@ -10,10 +10,23 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { FaPlus } from "react-icons/fa";
 import { Label } from "./ui/label";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { OrbitProgress } from "react-loading-indicators";
 
-const AddRuanganModal = () => {
+interface AddRuanganModalProps {
+  onSubmit: (data: {
+    namaRuangan: string;
+    imageFile: File | null;
+  }) => Promise<void>;
+  isLoading: boolean;
+}
+
+const AddRuanganModal = ({ onSubmit, isLoading }: AddRuanganModalProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [roomName, setRoomName] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,8 +34,24 @@ const AddRuanganModal = () => {
       const reader = new FileReader();
       reader.onload = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
+
+      setImageFile(file);
     }
   };
+
+  // Handle save new room
+  const handleSubmit = async () => {
+    await onSubmit({ namaRuangan: roomName, imageFile });
+    setRoomName("");
+    setImageFile(null);
+    setImagePreview(null);
+
+    // reset input file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // ✅ ini yang menghapus nama file
+    }
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -47,7 +76,9 @@ const AddRuanganModal = () => {
                 Nama Ruangan
               </Label>
               <Input
-                id="namaRuangan"
+                // id="namaRuangan"
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
                 placeholder="Contoh: Ruang Meeting 3"
                 className="bg-gray-800 border-gray-600 text-white mt-1"
               />
@@ -56,6 +87,7 @@ const AddRuanganModal = () => {
             <div>
               <Label className="text-sm">Upload Gambar</Label>
               <Input
+                ref={fileInputRef}
                 type="file"
                 accept="image/png, image/jpg, image/jpeg"
                 onChange={handleImageChange}
@@ -78,8 +110,18 @@ const AddRuanganModal = () => {
           </div>
         </div>
 
-        <Button className="bg-green-600 hover:bg-green-700 text-white mt-6">
-          Simpan
+        <Button
+          onClick={handleSubmit}
+          className="bg-green-600 hover:bg-green-700 text-white mt-6"
+        >
+          <span className="flex items-center gap-2">
+            Tambah Ruangan
+            <span>
+              {isLoading && (
+                <OrbitProgress style={{ fontSize: "4px" }} color="white" />
+              )}
+            </span>
+          </span>
         </Button>
       </DialogContent>
     </Dialog>

@@ -20,6 +20,8 @@ import {
   logoutAdmin,
 } from "../controllers/user.controller.js";
 
+import upload from "../middleware/uploadImages.js";
+
 const router = express.Router();
 
 // Login admin
@@ -28,7 +30,13 @@ router.post("/logout", logoutAdmin);
 router.get("/getAdmin", isAuthenticated, isAdmin, getAdmin);
 
 // Ruangan
-router.post("/ruangan", isAuthenticated, isAdmin, createRuangan);
+router.post(
+  "/ruangan",
+  isAuthenticated,
+  isAdmin,
+  upload.single("imageUrl"),
+  createRuangan
+);
 router.patch("/ruangan/:id", isAuthenticated, isAdmin, updateRuangan);
 router.delete("/ruangan/:id", isAuthenticated, isAdmin, deleteRuangan);
 router.get("/ruangan", getAllRuangan);

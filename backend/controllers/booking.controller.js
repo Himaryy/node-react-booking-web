@@ -124,12 +124,7 @@ export const getAllBookingByAdmin = async (
 
     const allBooking = await prisma.booking.findMany({
       include: {
-        ruangan: {
-          select: {
-            id: true,
-            namaRuangan: true,
-          },
-        },
+        ruangan: true,
         user: {
           select: {
             name: true,
@@ -171,9 +166,7 @@ export const getAllBookingByUser = async (
 
       //
       include: {
-        ruangan: {
-          select: { namaRuangan: true },
-        },
+        ruangan: true,
       },
     });
     console.log(allBooking);

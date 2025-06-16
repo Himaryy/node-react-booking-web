@@ -3,6 +3,7 @@ import userRoutes from "./routes/user.route.js";
 import bodyParser from "body-parser";
 import AdminRouter from "./routes/admin.route.js";
 import RuanganRouter from "./routes/ruangan.route.js";
+import uploadImages from "./utils/uploadRoute.js";
 import cors from "cors";
 
 const PORT = 8000;
@@ -20,6 +21,7 @@ const init = () => {
   server.use("/user", userRoutes);
   server.use("/admin", AdminRouter);
   server.use("/ruangan", RuanganRouter);
+  // server.use("/api-image", uploadImages);
 
   server.listen(PORT, () => {
     console.log(`Server Listening on Port ${PORT}`);

@@ -22,7 +22,9 @@ import { cn } from "~/lib/utils";
 interface BookingProps {
   id: number;
   ruangan: {
+    id: number;
     namaRuangan: string;
+    imageUrl: string;
   };
   status: string;
   tanggalPeminjaman: string;
@@ -239,6 +241,8 @@ const DaftarBooking = () => {
       {/* Sebelah kiri */}
       <div className="w-3/4 py-4 px-10">
         <h2 className="text-xl font-bold mb-2">Daftar Booking</h2>
+        {/* <pre>{JSON.stringify(bookings, null, 2)}</pre> */}
+
         <div className="grid grid-cols-4 gap-6">
           {loading ? (
             <OrbitProgress color="#32cd32" size="medium" text="" textColor="" />
@@ -251,7 +255,10 @@ const DaftarBooking = () => {
                     key={booking?.id}
                     title={booking?.ruangan?.namaRuangan}
                     status={booking?.status}
-                    imageUrl="https://placehold.co/600x400"
+                    imageUrl={
+                      booking.ruangan.imageUrl ||
+                      "https://placehold.co/600x400?text=No Image%0AFound"
+                    }
                     onSelected={() => setSelectedBookingRoomId(booking?.id)}
                     selected={selectedBookingRoomId === booking?.id}
                   />

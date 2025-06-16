@@ -40,7 +40,13 @@ const DeleteModalAdmin = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive" size="icon">
+        <Button
+          disabled={
+            booking.status === "Approved" || booking.status === "Rejected"
+          }
+          variant="destructive"
+          size="icon"
+        >
           <FaTrash />
         </Button>
       </DialogTrigger>

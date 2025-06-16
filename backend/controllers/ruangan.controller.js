@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import imageKit from "../utils/imagekit.js";
 
 const prisma = new PrismaClient();
 
@@ -7,12 +8,28 @@ export const createRuangan = async (
   /** @type import('express').Response */ res
 ) => {
   const { namaRuangan } = req.body;
+  const file = req.file;
+
+  // const imageUrl = file ?
   console.log(namaRuangan);
 
   try {
+    let imageUrl = null;
+
+    if (file) {
+      const uplodedImage = await imageKit.upload({
+        file: file.buffer,
+        fileName: file.originalname,
+        folder: "ruang_meeting",
+      });
+
+      imageUrl = uplodedImage.url;
+    }
+
     const newRuangan = await prisma.ruangan.create({
       data: {
         namaRuangan,
+        imageUrl,
       },
     });
 

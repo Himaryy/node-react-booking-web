@@ -21,6 +21,7 @@ import { withMinimumLoading } from "utils/MinimumTime";
 interface RoomsProps {
   id: number;
   namaRuangan: string;
+  imageUrl: string;
 }
 
 interface BookingProps {
@@ -237,7 +238,10 @@ const HomePage = () => {
                   <CardRoom
                     key={room.id}
                     title={room.namaRuangan}
-                    imageUrl="https://placehold.co/600x400"
+                    imageUrl={
+                      room.imageUrl ||
+                      "https://placehold.co/600x400?text=No Image%0AFound"
+                    }
                     onSelected={() => setSelectedRoomId(room.id)}
                     selected={selectedRoomId === room.id}
                   />

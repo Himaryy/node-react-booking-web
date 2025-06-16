@@ -43,7 +43,7 @@ const Dashboard = () => {
   const [jumlahRejected, setJumlahRejected] = useState(0);
   const [jumlahRuangan, setJumlahRuangan] = useState(0);
   const [loading, setLoading] = useState(false);
-  const location = useLocation();
+  // const location = useLocation();
 
   // Fetch data Booking
   useEffect(() => {

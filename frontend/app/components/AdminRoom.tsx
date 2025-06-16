@@ -8,14 +8,25 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import EditRuanganModal from "./EditRuanganModal";
+import { useState } from "react";
 
 interface RoomProps {
-  id?: number;
-  imageUrl?: string;
-  title?: string;
+  id: number;
+  imageUrl: string;
+  namaRuangan: string;
 }
 
-const AdminRoom = ({ id, title, imageUrl }: RoomProps) => {
+const AdminRoom = ({ id, namaRuangan, imageUrl }: RoomProps) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleSubmitEdit = async (
+    updated: { id: number; namaRuangan: string; imageUrl: string },
+    imageFile?: File | null
+  ) => {
+    // Kirim PATCH ke backend (implementasi sesuai backend kamu)
+    console.log("Mengirim edit:", updated, imageFile);
+    setIsDialogOpen(false);
+  };
   return (
     <Dialog>
       {/* Card Ruangan */}
@@ -33,14 +44,14 @@ const AdminRoom = ({ id, title, imageUrl }: RoomProps) => {
         <div className="rounded-t-xl overflow-hidden">
           <img
             src={imageUrl}
-            alt={title}
+            alt={namaRuangan}
             className="w-full h-36 object-cover"
           />
         </div>
 
         <div className="p-4">
           <h3 className="text-white text-base font-bold tracking-wide truncate">
-            {title}
+            {namaRuangan}
           </h3>
         </div>
       </div>
@@ -48,12 +59,16 @@ const AdminRoom = ({ id, title, imageUrl }: RoomProps) => {
       {/* Dialog Content */}
       <DialogContent className="bg-gray-900 text-gray-100 border border-gray-700">
         <DialogHeader>
-          <DialogTitle>Edit Ruangan {title}</DialogTitle>
+          <DialogTitle>Edit Ruangan {namaRuangan}</DialogTitle>
           <DialogDescription className="text-gray-400">
             Edit detail ruangan di bawah ini
           </DialogDescription>
         </DialogHeader>
         {/* Tambahkan form atau input di sini jika diperlukan */}
+        <EditRuanganModal
+          ruangan={{ id: id, namaRuangan, imageUrl: imageUrl || "" }}
+          onSubmit={handleSubmitEdit}
+        />
       </DialogContent>
     </Dialog>
   );

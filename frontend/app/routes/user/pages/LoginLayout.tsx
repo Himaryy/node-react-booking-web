@@ -1,5 +1,5 @@
 import { useAuth } from "hooks/AuthProvider";
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Navigate, Outlet } from "react-router";
 
 const LoginLayout = () => {
   const { user } = useAuth();

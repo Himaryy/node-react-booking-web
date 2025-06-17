@@ -112,7 +112,6 @@ const HomePage = () => {
 
   // Handle Booking Room
   const handleBooking = async () => {
-    console.log("cek button");
     if (
       !selectedRoom ||
       !dateInput ||
@@ -127,13 +126,6 @@ const HomePage = () => {
       });
       return;
     }
-    console.log("Data yang akan dikirim:", {
-      selectedRoom,
-      dateInput,
-      startTimeInput,
-      durationTimeInput,
-      keperluan,
-    });
 
     const tanggal = DateTime.fromJSDate(dateInput);
     const waktu = DateTime.fromJSDate(startTimeInput);
@@ -152,7 +144,6 @@ const HomePage = () => {
       durasiPeminjaman: durationTimeInput,
       keperluanRuangan: keperluan,
     };
-    console.log(bookingData);
 
     const parsedBookingData = createBookingSchema.safeParse(bookingData);
 
@@ -165,8 +156,6 @@ const HomePage = () => {
       return;
     }
 
-    console.log("Data valid, siap dikirim:", parsedBookingData.data);
-
     // send booking request to backend
     try {
       // Token Authorization
@@ -178,7 +167,6 @@ const HomePage = () => {
             console.error("Token not found in localStorage");
             return;
           }
-          console.log(parsedBookingData);
 
           await axios.post("http://localhost:8000/user/booking", bookingData, {
             headers: {

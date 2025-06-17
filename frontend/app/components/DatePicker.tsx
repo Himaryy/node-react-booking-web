@@ -10,7 +10,6 @@ import {
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { Calendar } from "~/components/ui/calendar";
-import { useEffect, useState } from "react";
 
 // Modif
 interface DatePickerProps {

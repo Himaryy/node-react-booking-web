@@ -72,11 +72,9 @@ const EditModalAdmin = ({
   status,
   setStatus,
   isLoading,
-  editedBooking,
   setEditedBooking,
   onSave,
 }: Omit<EditModalProps, "isOpen" | "onOpenChange">) => {
-  // console.log(status);
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

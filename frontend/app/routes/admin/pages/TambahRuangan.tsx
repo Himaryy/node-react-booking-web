@@ -97,10 +97,6 @@ const TambahRuangan = ({ ruangan }: AddRoomProps) => {
             formData.append("imageUrl", imageFile);
           }
 
-          // for (const pair of formData.entries()) {
-          //   console.log(pair[0] + ": ", pair[1]);
-          // }
-
           const response = await axios.post(
             "http://localhost:8000/admin/ruangan",
             formData,
@@ -186,8 +182,6 @@ const TambahRuangan = ({ ruangan }: AddRoomProps) => {
               ruangan.id === updateRuangan.id ? updateRuangan : ruangan
             )
           );
-          // console.log("Response data", response.data);
-          // console.log("Updated ruangan", updateRuangan);
         },
         setIsLoadingUpdate,
         1000

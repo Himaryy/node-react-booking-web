@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(true);
 
       const user = await AuthService.getUser();
-      // console.log("Fetched user:", user); // cek isi user
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user) || "");
     } catch (error) {
@@ -32,7 +31,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoadingAdmin(true);
 
       const admin = await AuthService.getAdmin();
-      console.log("Fetch Admin:", admin);
 
       setAdmin(admin);
       localStorage.setItem("admin", JSON.stringify(admin) || "");

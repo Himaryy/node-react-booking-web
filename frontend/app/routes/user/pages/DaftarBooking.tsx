@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuth } from "hooks/AuthProvider";
 import { Clock, FileWarning } from "lucide-react";
 import { DateTime } from "luxon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
 import { Navigate, useLocation } from "react-router";
 import { toast } from "sonner";
@@ -74,7 +74,6 @@ const DaftarBooking = () => {
         },
       })
       .then((res) => {
-        console.log("Booking data:", res.data.data);
         setBookings(res.data.data);
       })
       .catch((error) => console.error("Error Fetching Booking: ", error))
@@ -101,16 +100,13 @@ const DaftarBooking = () => {
           },
         })
         .then((res) => {
-          console.log("Selected Booking data:", res.data.data);
           const booking = res.data.data;
-          console.log("Nama Ruangan:", booking?.ruangan?.namaRuangan);
           setSelectedBookingData(booking);
 
           setDate(DateTime.fromISO(booking.tanggalPeminjaman).toJSDate());
           setStartTime(DateTime.fromISO(booking.waktuMulai).toJSDate());
           setKeperluan(booking.keperluanRuangan);
           setDurationTime(booking.durasiPeminjaman);
-          // console.log(setDate);
         })
         .catch((error) => {
           console.error("Error Fetching Selected Booking: ", error);
@@ -249,7 +245,6 @@ const DaftarBooking = () => {
           ) : (
             <>
               {bookings.map((booking, index) => {
-                // console.log("Booking:", booking);
                 return (
                   <CardRoom
                     key={booking?.id}

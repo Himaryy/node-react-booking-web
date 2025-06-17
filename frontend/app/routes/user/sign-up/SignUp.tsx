@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useAuth } from "hooks/AuthProvider";
 import { signUpSchema, type SignUpInput } from "lib/validations";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-import { toast } from "sonner";
 import { withMinimumLoading } from "utils/MinimumTime";
 import AuthForm from "~/components/AuthForm";
 

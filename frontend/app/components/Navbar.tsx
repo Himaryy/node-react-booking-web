@@ -4,7 +4,7 @@ import { useAuth } from "hooks/AuthProvider";
 import { Popover, PopoverTrigger } from "./ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { Skeleton } from "./ui/skeleton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { OrbitProgress } from "react-loading-indicators";
 import { toast } from "sonner";
 

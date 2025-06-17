@@ -68,8 +68,6 @@ export const getUser = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    console.log("getUser response.data:", response.data);
     return response.data.user;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch user");
@@ -87,7 +85,6 @@ export const getAdmin = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    // console.log("get Admin:", response.data);
     return response.data.user;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch user");

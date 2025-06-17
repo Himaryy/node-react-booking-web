@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useAuth } from "hooks/AuthProvider";
 import { FileWarning } from "lucide-react";
-import type { ay } from "node_modules/react-router/dist/development/route-data-C6QaL0wu.mjs";
 import { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router";
+import { Navigate } from "react-router";
 import { toast } from "sonner";
 import { withMinimumLoading } from "utils/MinimumTime";
 import CardAdmin from "~/components/CardAdmin";
@@ -71,7 +70,6 @@ const Dashboard = () => {
                 new Date(a.createdAt).getTime()
             );
             setBookingRooms(sortedBookings);
-            // console.log(bookings);
 
             const submitCount = bookings.filter(
               (booking: any) => booking.status === "Submit"
@@ -88,8 +86,6 @@ const Dashboard = () => {
             setJumlahSubmit(submitCount);
             setJumlahApproved(ApproveCount);
             setJumlahRejected(RejectedCount);
-            // console.log("jumlha:", jumlahSubmit);
-            // console.log("Booking admin", response.data.data);
           },
           setLoading,
           1000
@@ -132,10 +128,8 @@ const Dashboard = () => {
 
             const ruangans = response.data.data;
             setRuangans(ruangans);
-            // console.log("ini", ruangans);
 
             const totalRuangans = ruangans.length;
-            // console.log(totalRuangans);
             setJumlahRuangan(totalRuangans);
           },
           setLoading,

@@ -78,12 +78,6 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
       const existingStartTime = new Date(booking.waktuMulai);
       const existingEndTime = new Date(booking.waktuAkhir);
 
-      console.log("Bandingkan dengan:", {
-        newStartTime,
-        newEndTime,
-        existingStartTime,
-        existingEndTime,
-      });
       const isOverlap =
         newStartTime < existingEndTime && newEndTime > existingStartTime;
 
@@ -289,7 +283,6 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
         style: { backgroundColor: "#16a34a", color: "white" }, // bit green
       });
     } catch (error) {
-      console.log(error);
       toast.error("Error Delete Booking", {
         description: "Terjadi kesalahan saat melakukan delete booking.",
         richColors: true,

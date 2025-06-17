@@ -1,99 +1,58 @@
-Aplikasi manajemen peminjaman ruangan, terdiri dari backend (Express.js + Prisma ORM) dan frontend (SOON).
+# 🏢 Booking App Sederhana
+
+Aplikasi booking ruangan sederhana berbasis web, terdiri dari backend (Express.js + Prisma) dan frontend (React + React Router + Shadcn UI).
 
 ---
 
-## 📁 Struktur Proyek
+## ✨ Fitur Utama
 
-```bash
-📦 project-root/
-├── backend/
-│ ├── controllers/
-│ │ ├── booking.controller.js
-│ │ ├── ruangan.controller.js
-│ │ └── user.controller.js
-│ ├── middleware/
-│ │ └── auth.js
-│ ├── node_modules/
-│ ├── prisma/
-│ │ ├── schema.prisma
-│ │ └── seed.js
-│ ├── routes/
-│ │ ├── admin.routes.js
-│ │ └── user.routes.js
-│ ├── utils/
-│ │ ├── jwt.js
-│ │ └── token.js
-│ ├── .env
-│ ├── package.json
-│ └── server.js
-└── frontend (SOON)/
-```
-
-## 🚀 Fitur Backend
-
-- Auth (register, login) dengan JWT
-- Role: `Admin` dan `User`
-- Booking ruangan (CRUD)
-- Validasi konflik waktu booking
-- Manajemen data ruangan dan user
-- Otentikasi dan otorisasi middleware
-- Format waktu menggunakan ISO + Timezone support
+- ✅ Autentikasi dengan JWT (Login Admin & User)
+- 📆 Peminjaman ruangan dengan validasi waktu
+- 🖼️ Upload gambar ruangan via ImageKit
+- 🧾 Validasi data form dengan Zod
+- 📊 Panel admin untuk manajemen ruangan & booking
 
 ---
 
-## ⚙️ Teknologi yang Digunakan
+## 🏗️ Tech Stack
 
-| Teknologi  | Keterangan                           |
-| ---------- | ------------------------------------ |
-| Express.js | Framework backend REST               |
-| Prisma ORM | Query database (MySQL/PostgreSQL)    |
-| JWT        | Autentikasi token-based              |
-| Bcrypt     | Enkripsi password                    |
-| Nodemon    | Hot reload selama development        |
-| CORS       | Mengizinkan permintaan dari frontend |
-| dotenv     | Konfigurasi variabel lingkungan      |
+### 🔙 Backend
 
-# 1. Masuk ke folder backend
+- **Express.js**
+- **Prisma ORM**
+- **PostgreSQL** (via [Neon](https://neon.tech))
+- **JWT** (JSON Web Token)
+- **ImageKit** (untuk upload gambar)
+- **CORS**, **bcrypt**, **multer**, dll
+
+### 🔜 Frontend
+
+- **React**
+- **React Router v7**
+- **Shadcn UI**
+- **Zod** (validasi form)
+- **Axios**
+
+---
+
+## ⚙️ Setup
 
 ```bash
-cd backend
+DATABASE_URL=
+ACCESS_TOKEN_EXPIRE=
+ACCESS_TOKEN=
+IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_URL_ENDPOINT=
 ```
 
-# 2. Install semua dependencies
-
 ```bash
+# Install dependency
 npm install
-```
 
-# 3. Buat file .env (contoh isinya)
-
-```bash
-echo "DATABASE_URL=\"postgresql://user:password@localhost:5432/yourdb\"" >> .env
-echo "ACCESS_TOKEN=\"your_jwt_secret\"" >> .env
-echo "ACCESS_TOKEN_EXPIRE = 100" >> .env
-echo "PORT=5000" >> .env
-```
-
-# 4. Generate Prisma client
-
-```bash
+# Setup Prisma & generate client
 npx prisma generate
-```
 
-# 5. Buat migrasi awal dan push ke database
-
-```bash
-npx prisma migrate dev --name init
-```
-
-# 6. (Opsional) Jalankan seed data jika ada file prisma/seed.js
-
-```bash
-node prisma/seed.js
-```
-
-# 7. Jalankan server dengan nodemon
-
-```bash
-npm run dev
+# Seed data (opsional)
+npx prisma db seed
 ```

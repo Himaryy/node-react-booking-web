@@ -11,7 +11,6 @@ export const createRuangan = async (
   const file = req.file;
 
   // const imageUrl = file ?
-  console.log(namaRuangan);
 
   try {
     let imageUrl = null;
@@ -33,14 +32,12 @@ export const createRuangan = async (
       },
     });
 
-    console.log(newRuangan);
     return res.status(200).json({
       success: true,
       data: newRuangan,
       message: "Successfully Create Ruangan",
     });
   } catch (error) {
-    console.log("error during create ruangan: ", error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -61,7 +58,6 @@ export const getAllRuangan = async (
       data: allRuangan,
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -96,7 +92,6 @@ export const getRuangan = async (
       },
     });
   } catch (error) {
-    console.log("Error occured ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error ",
@@ -168,7 +163,6 @@ export const deleteRuangan = async (
       message: "Successfully Delete Ruangan",
     });
   } catch (error) {
-    console.log("Error occured ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error ",

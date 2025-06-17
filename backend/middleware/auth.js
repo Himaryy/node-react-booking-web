@@ -17,10 +17,8 @@ export const isAuthenticated = async (req, res, next) => {
     }
 
     const accessToken = authHeader.split(" ")[1];
-    console.log(accessToken);
 
     const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN);
-    console.log(decoded);
 
     if (!decoded) {
       return res.status(401).json({ message: "Access token is not valid" });

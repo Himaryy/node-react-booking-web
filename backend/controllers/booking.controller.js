@@ -61,7 +61,6 @@ export const createBooking = async (
         ruanganId,
       },
     });
-    console.log(newBooking);
 
     return res.status(200).json({
       success: true,
@@ -69,7 +68,6 @@ export const createBooking = async (
       data: newBooking,
     });
   } catch (error) {
-    console.log("error during create ruangan: ", error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -102,7 +100,6 @@ export const getRuanganBookings = async (
       data: bookings,
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -139,7 +136,6 @@ export const getAllBookingByAdmin = async (
       data: allBooking,
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -169,7 +165,6 @@ export const getAllBookingByUser = async (
         ruangan: true,
       },
     });
-    console.log(allBooking);
 
     return res.status(200).json({
       success: true,
@@ -188,7 +183,6 @@ export const getAllBookingByUser = async (
       // },
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -200,7 +194,6 @@ export const getBookingByUser = async (
   /** @type import('express').Request */ req,
   /** @type import('express').Response */ res
 ) => {
-  // console.log("object");
   try {
     const bookingId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -230,7 +223,6 @@ export const getBookingByUser = async (
       data: getBooking,
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -270,7 +262,6 @@ export const updateBookingByAdmin = async (
     const waktuAkhirDate = tanggalWaktuMulai.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);
-    console.log(bookingId);
 
     const userId = await prisma.user.findFirst({
       where: {
@@ -278,7 +269,6 @@ export const updateBookingByAdmin = async (
         // role:'User'
       },
     });
-    console.log(userId);
 
     // Validasi bentrok dengan booking lain yang sudah Approved
     if (userId.role == "Admin") {
@@ -331,15 +321,13 @@ export const updateBookingByAdmin = async (
       },
     });
 
-    console.log(bookingUpdate);
-
     return res.status(200).json({
       success: true,
       message: "Success Update Booking Ruangan",
       data: { bookingUpdate },
     });
   } catch (error) {
-    console.log("error occured : ", error);
+    "error occured : ", error;
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -414,14 +402,12 @@ export const updateBookingByUser = async (
     const waktuAkhirDate = tanggalWaktuMulai.plus({ hours: durasiPeminjaman });
 
     const bookingId = parseInt(req.params.id);
-    console.log(bookingId);
 
     const userId = await prisma.user.findFirst({
       where: {
         id: req.user.id,
       },
     });
-    console.log(userId);
 
     const booking = await prisma.booking.findFirst({
       where: {
@@ -463,15 +449,12 @@ export const updateBookingByUser = async (
       },
     });
 
-    console.log(bookingUpdate);
-
     return res.status(200).json({
       success: true,
       message: "Success Update Booking Ruangan",
       data: { bookingUpdate },
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -493,7 +476,6 @@ export const deleteBooking = async (
       message: "Successfully Cancel Booking",
     });
   } catch (error) {
-    console.log("error occured : ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

@@ -9,7 +9,6 @@ export const createUser = async (
   /** @type import('express').Response */ res
 ) => {
   const { email, name, password } = req.body;
-  console.log(req.body);
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -28,7 +27,6 @@ export const createUser = async (
 
     return response;
   } catch (error) {
-    console.log("Error During create user: ", error);
     const response = res.status(500).json({
       status: "Failed Create User",
       message: error.message,
@@ -42,7 +40,6 @@ export const loginUser = async (
   /** @type import('express').Request */ req,
   /** @type import('express').Response */ res
 ) => {
-  // console.log("REQ BODY", req.body);
   const { email, password } = req.body;
   try {
     const user = await prisma.user.findFirst({
@@ -71,7 +68,6 @@ export const loginUser = async (
     //   },
     // });
   } catch (error) {
-    console.log("Gagal Login: ", error);
     res.status(500).json({ message: "Server error during login" });
   }
 };
@@ -88,7 +84,6 @@ export const logoutUser = async (
       message: "User Logout Successfully",
     });
   } catch (error) {
-    console.log("Error Lgout User: ", error);
     res.status(500).json({
       success: false,
 
@@ -123,7 +118,6 @@ export const getUser = async (
       },
     });
   } catch (error) {
-    console.log("Error occured ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error ",
@@ -148,9 +142,7 @@ export const loginAdmin = async (
     }
 
     sendToken(user, 200, res);
-    console.log(user);
   } catch (error) {
-    console.log("Gagal Login: ", error);
     res.status(500).json({ message: "Server error during login" });
   }
 };
@@ -167,7 +159,6 @@ export const logoutAdmin = async (
       message: "Admin Logout Successfully",
     });
   } catch (error) {
-    console.log("Error Lgout User: ", error);
     res.status(500).json({
       success: false,
 
@@ -209,7 +200,6 @@ export const getAdmin = async (
       },
     });
   } catch (error) {
-    console.log("Error occured ", error);
     res.status(500).json({
       success: false,
       message: "Internal server error ",

@@ -13,9 +13,10 @@ import {
   MdOutlineMeetingRoom,
 } from "react-icons/md";
 import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
 
 const SidebarAdmin = () => {
-  const { admin, logoutAdmin } = useAuth();
+  const { admin, logoutAdmin, isLoadingAdmin } = useAuth();
   const [isLogout, setIsLogout] = useState(false);
   const [isOpenMenuRuangan, setIsOpenMenuRuangan] = useState(false);
   const navigate = useNavigate();
@@ -130,14 +131,21 @@ const SidebarAdmin = () => {
 
       {/* Footer: Logout */}
       <div className="flex items-center justify-between w-full mt-6 p-4 border-t border-gray-700 text-white">
-        <div>
-          <p className="text-sm font-semibold truncate">{admin?.name}</p>
-          <p className="text-xs text-gray-400 truncate">{admin?.email}</p>
-        </div>
+        {admin ? (
+          <div>
+            <p className="text-sm font-semibold truncate">{admin.name}</p>
+            <p className="text-xs text-gray-400 truncate">{admin.email}</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-4 w-24 bg-gray-700 rounded" />
+            <Skeleton className="h-3 w-36 bg-gray-700 rounded" />
+          </div>
+        )}
 
         <button
           onClick={handleLogout}
-          disabled={isLogout}
+          disabled={isLogout || !admin}
           className="disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLogout ? (

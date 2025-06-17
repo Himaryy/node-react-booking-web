@@ -17,14 +17,18 @@ interface AddRuanganModalProps {
   onSubmit: (data: {
     namaRuangan: string;
     imageFile: File | null;
-  }) => Promise<void>;
+  }) => Promise<boolean>;
   isLoading: boolean;
 }
 
-const AddRuanganModal = ({ onSubmit, isLoading }: AddRuanganModalProps) => {
+const AddRuanganModal = ({
+  onSubmit,
+  isLoading,
+}: Omit<AddRuanganModalProps, "isOpen" | "onOpenChange">) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [roomName, setRoomName] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,21 +45,25 @@ const AddRuanganModal = ({ onSubmit, isLoading }: AddRuanganModalProps) => {
 
   // Handle save new room
   const handleSubmit = async () => {
-    await onSubmit({ namaRuangan: roomName, imageFile });
-    setRoomName("");
-    setImageFile(null);
-    setImagePreview(null);
+    const response = await onSubmit({ namaRuangan: roomName, imageFile });
 
-    // reset input file
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // ✅ ini yang menghapus nama file
+    if (response) {
+      setRoomName("");
+      setImageFile(null);
+      setImagePreview(null);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      setIsDialogOpen(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-green-600 hover:bg-green-700 rounded-2xl text-white flex gap-2 items-center">
+        <Button className="bg-green-600 hover:bg-green-700 rounded-2xl text-white flex gap-2 items-center mt-2">
           <FaPlus /> <span>Ruangan</span>
         </Button>
       </DialogTrigger>
@@ -85,7 +93,10 @@ const AddRuanganModal = ({ onSubmit, isLoading }: AddRuanganModalProps) => {
             </div>
 
             <div>
-              <Label className="text-sm">Upload Gambar</Label>
+              <Label className="text-sm">
+                Upload Gambar{" "}
+                <span className="text-gray-400 text-xs">(opsional)</span>
+              </Label>
               <Input
                 ref={fileInputRef}
                 type="file"
@@ -111,6 +122,7 @@ const AddRuanganModal = ({ onSubmit, isLoading }: AddRuanganModalProps) => {
         </div>
 
         <Button
+          disabled={isLoading}
           onClick={handleSubmit}
           className="bg-green-600 hover:bg-green-700 text-white mt-6"
         >

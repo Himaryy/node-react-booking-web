@@ -242,7 +242,7 @@ const DataTableAdmin = ({ bookings, setBookings }: DataTableAdminProps) => {
       );
 
       toast.success("Update Booking", {
-        description: "Ruangan berhasil di update",
+        description: "Booking berhasil di update",
         richColors: true,
         style: { backgroundColor: "#16a34a", color: "white" }, // bit green
       });

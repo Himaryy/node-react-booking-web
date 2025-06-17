@@ -26,7 +26,7 @@ export const isAuthenticated = async (req, res, next) => {
       return res.status(401).json({ message: "Access token is not valid" });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { id: decoded.id },
     });
 

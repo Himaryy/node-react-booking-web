@@ -37,7 +37,13 @@ router.post(
   upload.single("imageUrl"),
   createRuangan
 );
-router.patch("/ruangan/:id", isAuthenticated, isAdmin, updateRuangan);
+router.patch(
+  "/ruangan/:id",
+  isAuthenticated,
+  isAdmin,
+  upload.single("imageUrl"),
+  updateRuangan
+);
 router.delete("/ruangan/:id", isAuthenticated, isAdmin, deleteRuangan);
 router.get("/ruangan", getAllRuangan);
 router.get("/ruangan/:id", getRuangan);

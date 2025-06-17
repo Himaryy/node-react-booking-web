@@ -1,13 +1,4 @@
-import { FaEdit } from "react-icons/fa";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+import DeleteRuanganAdmin from "./DeleteRuanganAdmin";
 import EditRuanganModal from "./EditRuanganModal";
 import { useState } from "react";
 
@@ -17,60 +8,88 @@ interface RoomProps {
   namaRuangan: string;
 }
 
-const AdminRoom = ({ id, namaRuangan, imageUrl }: RoomProps) => {
+interface EditRoomProps {
+  ruangan: RoomProps;
+  handleUpdate: (data: {
+    id: number;
+    namaRuangan: string;
+    imageFile: File | null;
+  }) => Promise<void>;
+  handleDelete: (ruangan: RoomProps) => Promise<void>;
+}
+
+const AdminRoom = ({ ruangan, handleUpdate, handleDelete }: EditRoomProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const handleSubmitEdit = async (
-    updated: { id: number; namaRuangan: string; imageUrl: string },
-    imageFile?: File | null
-  ) => {
-    // Kirim PATCH ke backend (implementasi sesuai backend kamu)
-    console.log("Mengirim edit:", updated, imageFile);
+  const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  // const [ruangans, setRuangans] = useState<RoomProps[]>([]);
+
+  // useEffect(() => {
+  //   // console.log("Render AdminRoom", ruangan);
+  //   setIsLoading(false); // reset loading jika ruangan baru datang
+  // }, [ruangan]);
+
+  const handleSubmitEdit = async (data: {
+    namaRuangan: string;
+    imageFile: File | null;
+  }) => {
+    setIsLoadingUpdate(true);
+    await handleUpdate({
+      ...data,
+      id: ruangan.id,
+    });
+    setIsLoadingUpdate(false);
     setIsDialogOpen(false);
   };
+
+  const handleSubmitDelete = async (ruangan: RoomProps) => {
+    setIsLoadingDelete(true);
+
+    await handleDelete({ ...ruangan, id: ruangan.id });
+    setIsLoadingDelete(false);
+    setIsDialogOpen(false);
+  };
+
   return (
-    <Dialog>
-      {/* Card Ruangan */}
-      <div className="relative rounded-xl bg-gray-800 border border-gray-700 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gray-500 group">
-        {/* Tombol edit pakai DialogTrigger */}
-        <div className="absolute top-2 right-2 z-10">
-          <DialogTrigger asChild>
-            <Button variant="secondary" size="icon">
-              <FaEdit className="w-4 h-4" />
-            </Button>
-          </DialogTrigger>
-        </div>
-
-        {/* Gambar ruangan */}
-        <div className="rounded-t-xl overflow-hidden">
-          <img
-            src={imageUrl}
-            alt={namaRuangan}
-            className="w-full h-36 object-cover"
+    <div
+      key={ruangan.id}
+      className="relative rounded-xl bg-gray-800 border border-gray-700 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"
+    >
+      {/* Tombol edit pakai DialogTrigger */}
+      <div className="absolute top-2 right-2 z-10">
+        <div className="flex gap-2">
+          <EditRuanganModal
+            ruangan={ruangan}
+            onSubmit={handleSubmitEdit}
+            isLoading={isLoadingUpdate}
           />
-        </div>
 
-        <div className="p-4">
-          <h3 className="text-white text-base font-bold tracking-wide truncate">
-            {namaRuangan}
-          </h3>
+          <DeleteRuanganAdmin
+            ruangan={ruangan}
+            isLoading={isLoadingDelete}
+            onDelete={handleSubmitDelete}
+          />
         </div>
       </div>
 
-      {/* Dialog Content */}
-      <DialogContent className="bg-gray-900 text-gray-100 border border-gray-700">
-        <DialogHeader>
-          <DialogTitle>Edit Ruangan {namaRuangan}</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Edit detail ruangan di bawah ini
-          </DialogDescription>
-        </DialogHeader>
-        {/* Tambahkan form atau input di sini jika diperlukan */}
-        <EditRuanganModal
-          ruangan={{ id: id, namaRuangan, imageUrl: imageUrl || "" }}
-          onSubmit={handleSubmitEdit}
+      {/* Gambar ruangan */}
+      <div className="rounded-t-xl overflow-hidden">
+        <img
+          src={
+            ruangan.imageUrl ||
+            "https://placehold.co/600x400?text=No Image%0AFound"
+          }
+          alt={ruangan.namaRuangan}
+          className="w-full h-36 object-cover"
         />
-      </DialogContent>
-    </Dialog>
+      </div>
+
+      <div className="p-4">
+        <h3 className="text-white text-base font-bold tracking-wide truncate">
+          {ruangan.namaRuangan}
+        </h3>
+      </div>
+    </div>
   );
 };
 

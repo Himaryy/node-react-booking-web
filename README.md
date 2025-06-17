@@ -2,6 +2,18 @@
 
 Aplikasi booking ruangan sederhana berbasis web, terdiri dari backend (Express.js + Prisma) dan frontend (React + React Router + Shadcn UI).
 
+## 🛑 Catatan
+
+> ⚠️ **Belum mendukung tampilan mobile / responsif**.  
+> Silakan gunakan **desktop browser** untuk pengalaman terbaik.
+
+> 🧪 **Coba akses Admin Panel dengan akun berikut:**
+
+```bash
+email: admin@example.com
+password: adminpassword
+```
+
 ---
 
 ## ✨ Fitur Utama

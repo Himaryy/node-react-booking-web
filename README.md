@@ -8,11 +8,8 @@ Aplikasi booking ruangan sederhana berbasis web, terdiri dari backend (Express.j
 > Silakan gunakan **desktop browser** untuk pengalaman terbaik.
 
 > 🧪 **Coba akses Admin Panel dengan akun berikut:**
-
-```bash
-email: admin@example.com
-password: adminpassword
-```
+> email: admin@example.com
+> password: adminpassword
 
 ---
 
